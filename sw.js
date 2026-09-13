@@ -1,10 +1,10 @@
-// ONLY FONTE | NO BS — Service Worker
+// OVERBOLT | NO BS — Service Worker
 // Stratégie : "stale-while-revalidate"
 // -> l'app s'ouvre INSTANTANÉMENT depuis le cache (fonctionne 100% hors ligne)
 // -> en parallèle, si du réseau est disponible, la nouvelle version est
 //    téléchargée en arrière-plan et sera utilisée au PROCHAIN lancement.
 
-const CACHE_NAME = "only-fonte-cache-v1"; // incrémenter (v2, v3...) à chaque MAJ pour forcer un nettoyage propre du cache
+const CACHE_NAME = "overbolt-cache-v1"; // incrémenter (v2, v3...) à chaque MAJ pour forcer un nettoyage propre du cache
 const CACHE_FILES = [
   "./",
   "./index.html"
