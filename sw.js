@@ -1,16 +1,16 @@
-// OVERBOLT | NO BS — Service Worker
-// Stratégie : "stale-while-revalidate"
-// -> l'app s'ouvre INSTANTANÉMENT depuis le cache (fonctionne 100% hors ligne)
-// -> en parallèle, si du réseau est disponible, la nouvelle version est
-//    téléchargée en arrière-plan et sera utilisée au PROCHAIN lancement.
+﻿// OVERBOLT | NO BS â€” Service Worker
+// StratÃ©gie : "stale-while-revalidate"
+// -> l'app s'ouvre INSTANTANÃ‰MENT depuis le cache (fonctionne 100% hors ligne)
+// -> en parallÃ¨le, si du rÃ©seau est disponible, la nouvelle version est
+//    tÃ©lÃ©chargÃ©e en arriÃ¨re-plan et sera utilisÃ©e au PROCHAIN lancement.
 
-const CACHE_NAME = "overbolt-cache-v2"; // incrémenter (v2, v3...) à chaque MAJ pour forcer un nettoyage propre du cache
+const CACHE_NAME = "overbolt-cache-v3"; // incrÃ©menter (v2, v3...) Ã  chaque MAJ pour forcer un nettoyage propre du cache
 const CACHE_FILES = [
   "./",
   "./index.html"
 ];
 
-// Installation : on met en cache les fichiers de base dès la première visite
+// Installation : on met en cache les fichiers de base dÃ¨s la premiÃ¨re visite
 self.addEventListener("install", (event) => {
   self.skipWaiting();
   event.waitUntil(
@@ -18,7 +18,7 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// Activation : on supprime les anciens caches (anciennes versions) si présents
+// Activation : on supprime les anciens caches (anciennes versions) si prÃ©sents
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -30,7 +30,7 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Récupération des pages : stale-while-revalidate
+// RÃ©cupÃ©ration des pages : stale-while-revalidate
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
@@ -46,8 +46,8 @@ self.addEventListener("fetch", (event) => {
           })
           .catch(() => cachedResponse); // hors ligne -> on retombe sur le cache
 
-        // Répond immédiatement avec le cache si dispo (rapide + hors ligne OK),
-        // sinon attend la réponse réseau (premier chargement).
+        // RÃ©pond immÃ©diatement avec le cache si dispo (rapide + hors ligne OK),
+        // sinon attend la rÃ©ponse rÃ©seau (premier chargement).
         return cachedResponse || fetchPromise;
       })
     )

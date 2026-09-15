@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.14</title>
+<title>OVERBOLT | NO BS v3.15</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -807,7 +807,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.14</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.15</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -3325,7 +3325,7 @@ function detectFocusedWeek(el){
    provoquait la boucle infinie observée dans les tentatives précédentes
    (v3.6 à v3.13, voir HANDOFF_claude_code.md section 3.2). Les événements
    pointer ne sont eux jamais provoqués par notre propre code. */
-var SPRING_RELEASE_DELAY_MS = 50;
+var SPRING_RELEASE_DELAY_MS = 400;
 var SPRING_DURATION_MS = 2300;
 function easeInOutSine(p){ return -(Math.cos(Math.PI * p) - 1) / 2; }
 
