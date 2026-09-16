@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.15</title>
+<title>OVERBOLT | NO BS v3.16</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -807,7 +807,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.15</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.16</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -3319,13 +3319,17 @@ function detectFocusedWeek(el){
    des faux déclenchements croisés). Tout l'état d'animation est stocké
    directement sur l'élément DOM concerné, jamais dans une variable globale
    partagée.
-   Le relâchement du doigt est détecté via pointerup/pointercancel, PAS via
-   l'événement "scroll" ou "scrollend" : l'animation de retour modifie
-   scrollLeft à ~60 im/s, ce qui redéclenche indéfiniment ces événements et
-   provoquait la boucle infinie observée dans les tentatives précédentes
-   (v3.6 à v3.13, voir HANDOFF_claude_code.md section 3.2). Les événements
-   pointer ne sont eux jamais provoqués par notre propre code. */
-var SPRING_RELEASE_DELAY_MS = 400;
+   Le relâchement du doigt est détecté via pointerup/pointercancel (jamais
+   provoqués par notre propre code). Depuis la v3.16, on n'enchaîne plus
+   directement sur le minuteur du ressort au relâchement : on laisse d'abord
+   le scroll natif terminer son inertie (décélération native du navigateur),
+   détectée via l'événement "scroll" avec un debounce court
+   (MOMENTUM_STOP_DEBOUNCE_MS) — flag _momentumWatchActive désactivé avant de
+   démarrer le ressort, donc les propres événements "scroll" de l'animation
+   du ressort (~60 im/s) ne peuvent plus la redéclencher en boucle (bug
+   identifié en v3.13, voir HANDOFF_claude_code.md section 3.2). */
+var SPRING_RELEASE_DELAY_MS = 1000; // délai APRÈS la fin du défilement inertiel natif, avant de déclencher le ressort
+var MOMENTUM_STOP_DEBOUNCE_MS = 100; // durée sans mouvement de scroll pour considérer que l'inertie native est terminée
 var SPRING_DURATION_MS = 2300;
 function easeInOutSine(p){ return -(Math.cos(Math.PI * p) - 1) / 2; }
 
@@ -3355,6 +3359,8 @@ function toggleSpringDebug(){
 }
 
 function interruptSpringLocal(el){
+  el._momentumWatchActive = false;
+  if(el._momentumTimer){ clearTimeout(el._momentumTimer); el._momentumTimer = null; }
   if(el._springTimer){ clearTimeout(el._springTimer); el._springTimer = null; }
   if(el._springAnimId){ cancelAnimationFrame(el._springAnimId); el._springAnimId = null; }
   if(el._isSpringAnimating){
@@ -3397,6 +3403,26 @@ function scheduleSpringBackLocal(el){
   springLog(el, "minuteur programmé ("+SPRING_RELEASE_DELAY_MS+"ms)");
 }
 
+/* Après le relâchement du doigt, le scroll continue naturellement en décélérant
+   (inertie native du navigateur). On attend que ce mouvement inertiel soit
+   totalement terminé (plus aucun événement "scroll" pendant MOMENTUM_STOP_DEBOUNCE_MS)
+   avant de démarrer le minuteur d'1s puis le ressort. */
+function scheduleMomentumCheck(el){
+  clearTimeout(el._momentumTimer);
+  el._momentumTimer = setTimeout(function(){
+    el._momentumTimer = null;
+    if(!el._momentumWatchActive) return;
+    el._momentumWatchActive = false;
+    springLog(el, "défilement inertiel terminé");
+    scheduleSpringBackLocal(el);
+  }, MOMENTUM_STOP_DEBOUNCE_MS);
+}
+function watchMomentumThenSpring(el){
+  el._momentumWatchActive = true;
+  springLog(el, "attente fin du défilement inertiel");
+  scheduleMomentumCheck(el);
+}
+
 function initSeriesScroller(el){
   el.addEventListener("pointerdown", function(e){
     el._isPointerDown = true;
@@ -3411,12 +3437,13 @@ function initSeriesScroller(el){
     el._isPointerDown = false;
     el._activePointerId = undefined;
     springLog(el, "doigt relâché");
-    scheduleSpringBackLocal(el);
+    watchMomentumThenSpring(el);
   }
   el.addEventListener("pointerup", onRelease, {passive:true});
   el.addEventListener("pointercancel", onRelease, {passive:true});
 
   el.addEventListener("scroll", function(){
+    if(el._momentumWatchActive) scheduleMomentumCheck(el);
     clearTimeout(el._focusDetectTimer);
     el._focusDetectTimer = setTimeout(function(){ detectFocusedWeek(el); }, 120);
   }, {passive:true});
