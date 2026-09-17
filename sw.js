@@ -4,7 +4,7 @@
 // -> en parallèle, si du réseau est disponible, la nouvelle version est
 //    téléchargée en arrière-plan et sera utilisée au PROCHAIN lancement.
 
-const CACHE_NAME = "overbolt-cache-v6"; // incrémenter (v2, v3...) à chaque MAJ pour forcer un nettoyage propre du cache
+const CACHE_NAME = "overbolt-cache-v7"; // incrémenter (v2, v3...) à chaque MAJ pour forcer un nettoyage propre du cache
 const CACHE_FILES = [
   "./",
   "./index.html"

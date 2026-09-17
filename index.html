@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.18</title>
+<title>OVERBOLT | NO BS v3.19</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -807,7 +807,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.18</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.19</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -3248,7 +3248,12 @@ function renderSeriesList(){
       var oldNameInline = (rowEntry.nameAtTime && rowEntry.nameAtTime !== exo.name)
         ? ' <span class="week-old-name" title="'+t("week_old_name_title")+'">· '+escapeHtml(rowEntry.nameAtTime)+'</span>'
         : '';
-      html += '<div class="week-pill'+(isBestWeek?' week-pill-best':'')+'"><span>'+bestBadge+t("week_prefix")+' '+isoWeekNumber(week.startDate)+' <em class="week-year">'+new Date(week.startDate).getFullYear()+'</em> · '+formatShortDate(week.startDate)+oldNameInline+'</span><button data-role="week-del" data-week="'+wi+'" title="'+t("delete_week_title")+'">✕</button></div>';
+      // affichage seul : la plage complète (lundi -> dimanche) de la semaine de suivi,
+      // purement informative — n'affecte ni week.startDate ni aucune donnée sauvegardée.
+      var weekEndDate = new Date(week.startDate);
+      weekEndDate.setDate(weekEndDate.getDate() + 6);
+      var weekRangeLabel = formatShortDate(week.startDate) + " - " + formatShortDate(weekEndDate.toISOString());
+      html += '<div class="week-pill'+(isBestWeek?' week-pill-best':'')+'"><span>'+bestBadge+t("week_prefix")+' '+isoWeekNumber(week.startDate)+' <em class="week-year">'+new Date(week.startDate).getFullYear()+'</em> · '+weekRangeLabel+oldNameInline+'</span><button data-role="week-del" data-week="'+wi+'" title="'+t("delete_week_title")+'">✕</button></div>';
       html += '<div class="week-group-cards">';
       row.forEach(function(serie, si){
         var cardDoneClass = serie.validated ? "serie-done" : "";
