@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.16</title>
+<title>OVERBOLT | NO BS v3.17</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -807,7 +807,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.16</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.17</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -4755,7 +4755,19 @@ function ensureSessionStarted(){
         conflictWeek.session.startAt = null;
         conflictWeek.session.endAt = null;
       } else if(confirm(tf("session_conflict_finish_prompt", conflictLabel))){
-        conflictWeek.session.endAt = new Date().toISOString();
+        var conflictHasValidated = conflictWeek.rows.some(function(r){
+          return r.series.some(function(s){ return !!s.validated; });
+        });
+        if(conflictHasValidated){
+          conflictWeek.session.endAt = new Date().toISOString();
+        } else {
+          // Aucun exercice n'a été validé dans cette séance : la "terminer" la
+          // compterait comme faite dans le Bilan (durée, nombre de séances) alors
+          // qu'aucune série n'a réellement été enregistrée — on l'annule plutôt
+          // silencieusement, comme si elle n'avait jamais commencé.
+          conflictWeek.session.startAt = null;
+          conflictWeek.session.endAt = null;
+        }
       } else {
         return; // conflit non résolu : on ne démarre rien
       }
