@@ -3,7 +3,7 @@
 // -> avec du réseau, la dernière version s'affiche dès l'ouverture
 // -> hors ligne (ou réseau lent), l'app s'ouvre depuis le cache.
 
-const CACHE_NAME = "overbolt-cache-v25"; // incrémenter (v2, v3...) à chaque MAJ pour forcer un nettoyage propre du cache
+const CACHE_NAME = "overbolt-cache-v26"; // incrémenter (v2, v3...) à chaque MAJ pour forcer un nettoyage propre du cache
 const CACHE_FILES = [
   "./",
   "./index.html"

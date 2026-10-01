@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.35</title>
+<title>OVERBOLT | NO BS v3.36</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -845,7 +845,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.35</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.36</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -5260,13 +5260,64 @@ requestAnimationFrame(function(){
 // Enregistrement du service worker : rend l'app utilisable 100% hors ligne
 // après le tout premier chargement, tout en se mettant à jour automatiquement
 // en arrière-plan dès qu'une connexion est disponible.
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    navigator.serviceWorker.register("./sw.js").catch(function (err) {
-      console.warn("Service worker non disponible :", err);
-    });
+/* Mises à jour : Chrome ne vérifie sw.js qu'~1 fois/24h et une PWA réveillée depuis la mémoire ne recharge
+   pas la page. On force donc la vérification à chaque retour dans l'app, puis on compare la version de
+   la page en ligne (<title>) à celle affichée : rechargement automatique si aucune séance n'est en cours,
+   sinon petit bandeau « Nouvelle version ». */
+var UPD_TXT = {"fr": "Nouvelle version disponible — toucher pour mettre à jour", "en": "New version available — tap to update", "es": "Nueva versión disponible — toca para actualizar", "de": "Neue Version verfügbar — zum Aktualisieren tippen", "it": "Nuova versione disponibile — tocca per aggiornare", "ru": "Доступна новая версия — нажмите, чтобы обновить", "zh": "有新版本 — 点按更新", "pt": "Nova versão disponível — toque para atualizar", "ja": "新しいバージョンがあります — タップして更新", "ko": "새 버전이 있습니다 — 눌러서 업데이트", "tr": "Yeni sürüm mevcut — güncellemek için dokunun", "pl": "Dostępna nowa wersja — dotknij, aby zaktualizować", "ar": "يتوفر إصدار جديد — اضغط للتحديث", "en-US": "New version available — tap to update", "hi": "नया संस्करण उपलब्ध है — अपडेट करने के लिए टैप करें", "id": "Versi baru tersedia — ketuk untuk memperbarui"};
+function readSavedState(){
+  try{ return JSON.parse(localStorage.getItem("muscleman_state_v1_6") || "null"); }catch(e){ return null; }
+}
+function anySessionRunning(){
+  var st = readSavedState();
+  if(!st || !st.days) return false;
+  return Object.keys(st.days).some(function(d){
+    var day = st.days[d];
+    return day && day.weeks && day.weeks.some(function(w){ return w.session && w.session.startAt && !w.session.endAt; });
   });
 }
+function showUpdateBanner(newTitle){
+  if(document.getElementById("updateBanner")) return;
+  var v = (/v\d+(?:\.\d+)*/.exec(newTitle) || [""])[0];
+  var b = document.createElement("button");
+  b.id = "updateBanner";
+  var st0 = readSavedState(), lg = (st0 && st0.settings && st0.settings.language) || "en";
+  b.textContent = (UPD_TXT[lg] || UPD_TXT.en) + (v ? " (" + v + ")" : "");
+  b.style.cssText = "position:fixed;top:calc(env(safe-area-inset-top,0px) + 6px);left:50%;transform:translateX(-50%);z-index:2147483000;max-width:92vw;padding:10px 16px;border-radius:12px;border:1.5px solid var(--neon);background:var(--bg-0);color:var(--text);font-family:var(--font-display);font-weight:700;font-size:.8rem;cursor:pointer;box-shadow:0 0 12px var(--neon-glow);";
+  b.addEventListener("click", function(){ location.reload(); });
+  document.body.appendChild(b);
+}
+var lastUpdateCheck = 0;
+function checkForUpdate(){
+  var now = Date.now();
+  if(now - lastUpdateCheck < 15000) return;
+  lastUpdateCheck = now;
+  if(navigator.serviceWorker && navigator.serviceWorker.getRegistration){
+    navigator.serviceWorker.getRegistration().then(function(reg){ if(reg) reg.update(); }).catch(function(){});
+  }
+  fetch("./index.html", {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(html){
+    var m = /<title>([^<]*)<\/title>/.exec(html || "");
+    if(!m || m[1] === document.title) return;
+    var tried = "";
+    try{ tried = sessionStorage.getItem("ob_update_tried") || ""; }catch(e){}
+    if(!anySessionRunning() && tried !== m[1]){
+      try{ sessionStorage.setItem("ob_update_tried", m[1]); }catch(e){}
+      location.reload();
+    } else {
+      showUpdateBanner(m[1]);
+    }
+  }).catch(function(){});
+}
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./sw.js", {updateViaCache:"none"}).then(function(reg){ reg.update(); }).catch(function (err) {
+      console.warn("Service worker non disponible :", err);
+    });
+    setTimeout(checkForUpdate, 2500);
+  });
+}
+document.addEventListener("visibilitychange", function(){ if(document.visibilityState === "visible") checkForUpdate(); });
+window.addEventListener("pageshow", function(e){ if(e.persisted) checkForUpdate(); });
 </script>
 </body>
 </html>
