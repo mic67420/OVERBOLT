@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.37</title>
+<title>OVERBOLT | NO BS v3.38</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -847,7 +847,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.37</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.38</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -3909,8 +3909,7 @@ document.addEventListener("click", function(e){
     // séance (semaine en cours, jamais commencée) alors qu'une autre séance est déjà
     // en cours ailleurs, on bloque avant toute modification.
     if(!serie.validated && w === data.weeks.length - 1 && !week.session.startAt){
-      var blockingDay = findOtherActiveSessionDay();
-      if(blockingDay){ alert(tf("other_session_active_alert", blockingDay)); return; }
+      if(!resolveSessionConflict(week)) return; // propose d'annuler/terminer l'autre séance
     }
     serie.validated = !serie.validated;
     // le chrono de séance démarre via "ÉCHAUFFEMENT" OU dès la validation d'une
@@ -4928,53 +4927,54 @@ function widgetSessionActive(){
   var week = data.weeks[data.weeks.length - 1];
   return !!(week.session && week.session.startAt);
 }
+/* Cohérence entre séances ET entre semaines : impossible de démarrer une nouvelle séance tant
+   qu'une autre est restée en cours ailleurs (autre séance, ou semaine passée jamais résolue).
+   Renvoie true si on peut démarrer (aucun conflit, ou conflit résolu par l'utilisateur). */
+function resolveSessionConflict(week){
+  var conflictWeek = null, conflictLabel = null;
+  state.dayOrder.forEach(function(d){
+    if(conflictWeek) return;
+    var otherDay = state.days[d];
+    if(!otherDay) return;
+    otherDay.weeks.forEach(function(w){
+      if(conflictWeek) return;
+      if(w === week) return; // jamais la semaine qu'on essaie justement de démarrer
+      if(w.session && w.session.startAt && !w.session.endAt){
+        conflictWeek = w;
+        conflictLabel = d + " (S." + isoWeekNumber(w.startDate) + ")";
+      }
+    });
+  });
+  if(!conflictWeek) return true;
+  if(confirm(tf("session_conflict_cancel_prompt", conflictLabel))){
+    conflictWeek.session.startAt = null;
+    conflictWeek.session.endAt = null;
+  } else if(confirm(tf("session_conflict_finish_prompt", conflictLabel))){
+    var conflictHasValidated = conflictWeek.rows.some(function(r){
+      return r.series.some(function(s){ return !!s.validated; });
+    });
+    if(conflictHasValidated){
+      conflictWeek.session.endAt = new Date().toISOString();
+    } else {
+      // Aucun exercice validé : la "terminer" la compterait comme faite dans le Bilan
+      // alors qu'aucune série n'a été enregistrée — on l'annule comme si elle n'avait
+      // jamais commencé.
+      conflictWeek.session.startAt = null;
+      conflictWeek.session.endAt = null;
+    }
+  } else {
+    return false; // conflit non résolu : on ne démarre rien
+  }
+  renderDayPills();
+  return true;
+}
 function ensureSessionStarted(){
   var data = currentData();
   var week = data.weeks[data.weeks.length - 1];
   if(!week.session) week.session = {startAt:null, endAt:null, lastActivityAt:null};
   if(week.session.endAt) return; // séance déjà terminée : ne redémarre pas toute seule
   if(!week.session.startAt){
-    // Cohérence entre séances ET entre semaines : impossible de démarrer une
-    // nouvelle séance tant qu'une autre est restée en cours ailleurs — que ce
-    // soit sur une autre séance, ou une semaine passée jamais résolue.
-    var conflictDay = null, conflictWeek = null, conflictLabel = null;
-    state.dayOrder.forEach(function(d){
-      if(conflictDay) return;
-      var otherDay = state.days[d];
-      if(!otherDay) return;
-      otherDay.weeks.forEach(function(w){
-        if(conflictDay) return;
-        if(w === week) return; // jamais la semaine qu'on essaie justement de démarrer
-        if(w.session && w.session.startAt && !w.session.endAt){
-          conflictDay = d;
-          conflictWeek = w;
-          conflictLabel = d + " (S." + isoWeekNumber(w.startDate) + ")";
-        }
-      });
-    });
-    if(conflictDay){
-      if(confirm(tf("session_conflict_cancel_prompt", conflictLabel))){
-        conflictWeek.session.startAt = null;
-        conflictWeek.session.endAt = null;
-      } else if(confirm(tf("session_conflict_finish_prompt", conflictLabel))){
-        var conflictHasValidated = conflictWeek.rows.some(function(r){
-          return r.series.some(function(s){ return !!s.validated; });
-        });
-        if(conflictHasValidated){
-          conflictWeek.session.endAt = new Date().toISOString();
-        } else {
-          // Aucun exercice n'a été validé dans cette séance : la "terminer" la
-          // compterait comme faite dans le Bilan (durée, nombre de séances) alors
-          // qu'aucune série n'a réellement été enregistrée — on l'annule plutôt
-          // silencieusement, comme si elle n'avait jamais commencé.
-          conflictWeek.session.startAt = null;
-          conflictWeek.session.endAt = null;
-        }
-      } else {
-        return; // conflit non résolu : on ne démarre rien
-      }
-      renderDayPills();
-    }
+    if(!resolveSessionConflict(week)) return;
     week.session.startAt = new Date().toISOString();
     saveState();
   }
