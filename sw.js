@@ -1,10 +1,9 @@
 // OVERBOLT | NO BS — Service Worker
-// Stratégie : "stale-while-revalidate"
-// -> l'app s'ouvre INSTANTANÉMENT depuis le cache (fonctionne 100% hors ligne)
-// -> en parallèle, si du réseau est disponible, la nouvelle version est
-//    téléchargée en arrière-plan et sera utilisée au PROCHAIN lancement.
+// Stratégie : "réseau d'abord, cache en repli"
+// -> avec du réseau, la dernière version s'affiche dès l'ouverture
+// -> hors ligne (ou réseau lent), l'app s'ouvre depuis le cache.
 
-const CACHE_NAME = "overbolt-cache-v16"; // incrémenter (v2, v3...) à chaque MAJ pour forcer un nettoyage propre du cache
+const CACHE_NAME = "overbolt-cache-v17"; // incrémenter (v2, v3...) à chaque MAJ pour forcer un nettoyage propre du cache
 const CACHE_FILES = [
   "./",
   "./index.html"
@@ -30,26 +29,28 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Récupération des pages : stale-while-revalidate
+// Récupération des pages : RÉSEAU D'ABORD (version à jour dès l'ouverture),
+// repli sur le cache si hors ligne ou si le réseau met plus de 3 s à répondre.
+// cache:"no-cache" force la revalidation (GitHub Pages met en cache ~10 min).
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
   event.respondWith(
-    caches.open(CACHE_NAME).then((cache) =>
-      cache.match(event.request).then((cachedResponse) => {
-        const fetchPromise = fetch(event.request)
-          .then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              cache.put(event.request, networkResponse.clone());
-            }
-            return networkResponse;
-          })
-          .catch(() => cachedResponse); // hors ligne -> on retombe sur le cache
+    caches.open(CACHE_NAME).then((cache) => {
+      const network = fetch(event.request, { cache: "no-cache" }).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          cache.put(event.request, networkResponse.clone());
+        }
+        return networkResponse;
+      });
+      // laisse le téléchargement se terminer (et mettre le cache à jour) même après le délai
+      event.waitUntil(network.catch(() => {}));
 
-        // Répond immédiatement avec le cache si dispo (rapide + hors ligne OK),
-        // sinon attend la réponse réseau (premier chargement).
-        return cachedResponse || fetchPromise;
-      })
-    )
+      const timeout = new Promise((resolve) => setTimeout(() => resolve(null), 3000));
+      return Promise.race([network.catch(() => null), timeout]).then((response) => {
+        if (response) return response;
+        return cache.match(event.request).then((cached) => cached || network);
+      });
+    })
   );
 });
