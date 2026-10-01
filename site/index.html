@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OVERBOLT | NO BS — Le carnet de musculation sans blabla</title>
+<meta name="description" content="OVERBOLT | NO BS : suivi de séances de musculation rapide et sans fioritures. Charges, répétitions, repos, historique par semaine et bilan. Données 100 % sur ton téléphone, fonctionne hors ligne, 16 langues.">
+<meta name="theme-color" content="#05070a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="OVERBOLT | NO BS — Le carnet de musculation sans blabla">
+<meta property="og:description" content="Séances, séries, charges, repos et progression. Rapide à saisir, 100 % sur ton téléphone, même sans connexion.">
+<meta property="og:image" content="img/app-series-dark.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"OVERBOLT | NO BS","applicationCategory":"HealthApplication","operatingSystem":"Android, iOS (PWA)","description":"Application de suivi de musculation : séances, séries, charges, répétitions, repos, historique et bilan. Fonctionne hors ligne.","inLanguage":["fr","en","es","de","it","pt","ru","zh","ja","ko","tr","pl","ar","hi","id"]}
+</script>
+<style>
+:root{
+  --bg:#05070a; --bg2:#0b1016; --panel:rgba(255,255,255,.04); --line:rgba(255,255,255,.12);
+  --text:#eef3f7; --dim:#9aa7b4; --neon:#2af5e0; --warm:#ff8a3d; --violet:#8b5cff;
+  --radius:18px; --maxw:1120px;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+img,video{max-width:100%;display:block}
+a{color:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+:focus-visible{outline:3px solid var(--neon);outline-offset:3px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+
+/* en-tête */
+header{position:sticky;top:0;z-index:20;background:rgba(5,7,10,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:18px;height:62px}
+.logo{font-weight:800;letter-spacing:.04em;text-decoration:none;font-size:1.05rem;white-space:nowrap}
+.logo b{color:#fff;font-weight:900}
+.logo span{color:var(--dim);font-weight:600}
+nav{margin-left:auto;display:flex;align-items:center;gap:6px}
+nav a.lnk{padding:8px 12px;color:var(--dim);text-decoration:none;font-weight:600;font-size:.92rem;border-radius:10px}
+nav a.lnk:hover{color:var(--text);background:var(--panel)}
+.lang{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.lang button{background:none;border:0;color:var(--dim);font-weight:700;font-size:.8rem;font-family:inherit;padding:7px 10px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--neon);color:#001a17}
+@media (max-width:980px){nav a.lnk{display:none}}
+@media (max-width:480px){.bar{gap:8px}.logo{font-size:.88rem}nav{gap:6px}.lang button{padding:6px 8px}.btn.sm{padding:8px 12px}}
+@media (max-width:350px){.logo{font-size:.72rem;letter-spacing:0}.lang button{padding:5px 6px;font-size:.72rem}.btn.sm{padding:7px 9px;font-size:.78rem}.wrap{padding:0 14px}}
+
+/* boutons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;border-radius:14px;font-weight:800;font-size:1rem;text-decoration:none;border:1.5px solid transparent;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--neon);color:#001a17;box-shadow:0 0 22px rgba(42,245,224,.35)}
+.btn.primary:hover{box-shadow:0 0 32px rgba(42,245,224,.55)}
+.btn.ghost{border-color:var(--line);color:var(--text);background:var(--panel)}
+.btn.ghost:hover{border-color:var(--neon)}
+.btn.sm{padding:9px 16px;font-size:.88rem;border-radius:11px}
+
+/* héros */
+.hero{padding:56px 0 40px;background:radial-gradient(900px 420px at 80% 0%,rgba(139,92,255,.22),transparent 60%),radial-gradient(700px 380px at 5% 30%,rgba(42,245,224,.13),transparent 60%)}
+.hero .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:center}
+.eyebrow{display:inline-block;color:var(--neon);font-weight:800;letter-spacing:.14em;font-size:.78rem;text-transform:uppercase;margin-bottom:14px}
+h1{font-size:clamp(2.2rem,5.4vw,3.9rem);line-height:1.04;margin:0 0 18px;font-weight:900;letter-spacing:-.02em}
+h1 em{font-style:normal;color:var(--neon)}
+.lead{font-size:1.18rem;color:var(--dim);max-width:34em;margin:0 0 26px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:0;list-style:none}
+.chips li{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 13px;font-size:.84rem;color:var(--dim);font-weight:600}
+@media (max-width:860px){.hero .grid{grid-template-columns:1fr}.hero{padding-top:34px}}
+
+/* téléphone */
+.phone{position:relative;width:min(290px,70vw);margin:0 auto;aspect-ratio:390/844;border-radius:42px;padding:9px;background:linear-gradient(145deg,#2a323c,#0d1116);box-shadow:0 30px 70px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.14),0 0 60px rgba(42,245,224,.16)}
+.phone::before{content:"";position:absolute;top:17px;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:#000;z-index:2;box-shadow:0 0 0 2px rgba(255,255,255,.08)}
+.phone .screen{width:100%;height:100%;border-radius:34px;overflow:hidden;background:#000}
+.phone .screen img{width:100%;height:100%;object-fit:cover;object-position:top}
+.phone.small{width:min(230px,60vw)}
+
+/* sections */
+section{padding:72px 0}
+section.alt{background:linear-gradient(180deg,var(--bg2),var(--bg))}
+h2{font-size:clamp(1.7rem,3.6vw,2.5rem);line-height:1.1;margin:0 0 12px;font-weight:900;letter-spacing:-.015em}
+.sub{color:var(--dim);font-size:1.08rem;max-width:40em;margin:0 0 36px}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{border:1px solid var(--line);background:var(--panel);border-radius:var(--radius);padding:24px}
+.card .ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:1.35rem;background:rgba(42,245,224,.1);border:1px solid rgba(42,245,224,.3);margin-bottom:14px}
+.card h3{margin:0 0 6px;font-size:1.12rem}
+.card p{margin:0;color:var(--dim);font-size:.97rem}
+@media (max-width:900px){.features{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.features{grid-template-columns:1fr}}
+
+/* vidéo */
+.video-box{position:relative;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#000;aspect-ratio:16/9;max-width:900px;margin:0 auto;display:grid;place-items:center}
+.video-box video{width:100%;height:100%;object-fit:contain;background:#000}
+.video-ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--dim);background:radial-gradient(500px 240px at 50% 40%,rgba(42,245,224,.12),transparent 70%)}
+.video-ph .play{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;margin:0 auto 14px;border:2px solid var(--neon);color:var(--neon);font-size:1.8rem;box-shadow:0 0 28px rgba(42,245,224,.35)}
+
+/* galerie */
+.gallery{display:flex;gap:26px;overflow-x:auto;padding:10px 4px 26px;scroll-snap-type:x mandatory;justify-content:safe center}
+.gallery figure{margin:0;flex:0 0 auto;scroll-snap-align:center;text-align:center}
+.gallery figcaption{margin-top:14px;color:var(--dim);font-weight:600;font-size:.95rem}
+
+/* installation */
+.steps{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.steps h3{margin:0 0 10px}
+.steps ol{margin:0;padding-left:1.2em;color:var(--dim)}
+.steps li{margin:6px 0}
+.steps li b{color:var(--text)}
+@media (max-width:760px){.steps{grid-template-columns:1fr}}
+
+/* FAQ */
+details{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:0 20px;margin-bottom:10px}
+summary{cursor:pointer;font-weight:700;padding:16px 0;list-style:none;display:flex;justify-content:space-between;gap:14px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--neon);font-size:1.3rem;line-height:1}
+details[open] summary::after{content:"–"}
+details p{margin:0 0 16px;color:var(--dim)}
+
+/* appel final */
+.final{text-align:center;padding:84px 0;background:radial-gradient(700px 320px at 50% 0%,rgba(139,92,255,.25),transparent 70%)}
+.final p{color:var(--dim);margin:0 auto 26px;max-width:34em}
+footer{border-top:1px solid var(--line);padding:30px 0;color:var(--dim);font-size:.88rem}
+footer .row{display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:space-between}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="#top" aria-label="OVERBOLT | NO BS"><b>OVERBOLT</b> <span>|</span> <b>NO BS</b></a>
+    <nav aria-label="Navigation">
+      <a class="lnk" href="#fonctions" data-i18n="nav_features">Fonctionnalités</a>
+      <a class="lnk" href="#demo" data-i18n="nav_demo">Démo</a>
+      <a class="lnk" href="#installer" data-i18n="nav_install">Installer</a>
+      <a class="lnk" href="#faq">FAQ</a>
+      <div class="lang" role="group" aria-label="Langue / Language">
+        <button type="button" data-lang="fr" aria-pressed="true">FR</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <a class="btn primary sm" data-buy href="#" data-i18n="cta_short">Obtenir</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+<div class="hero">
+  <div class="wrap grid">
+    <div>
+      <span class="eyebrow" data-i18n="eyebrow">Application de suivi de musculation</span>
+      <h1 data-i18n-html="h1">Ton carnet de muscu.<br><em>Sans blabla.</em></h1>
+      <p class="lead" data-i18n="lead">Séances, séries, charges, répétitions et repos : tu saisis en quelques secondes, tu vois ta progression semaine après semaine. Tout reste sur ton téléphone, même sans connexion.</p>
+      <div class="cta">
+        <a class="btn primary" data-buy href="#" data-i18n="cta">Obtenir OVERBOLT</a>
+        <a class="btn ghost" href="#demo" data-i18n="cta_demo">▶ Voir la démo</a>
+      </div>
+      <ul class="chips">
+        <li data-i18n="chip1">Hors ligne</li>
+        <li data-i18n="chip2">Données privées</li>
+        <li data-i18n="chip3">Android &amp; iPhone</li>
+        <li data-i18n="chip4">16 langues</li>
+      </ul>
+    </div>
+    <div class="phone" aria-hidden="false">
+      <div class="screen"><img id="heroShot" src="img/app-series-dark.jpg" width="780" height="1688" alt="Écran Séries d'OVERBOLT : exercices, séries, charges et répétitions" fetchpriority="high"></div>
+    </div>
+  </div>
+</div>
+
+<section id="fonctions">
+  <div class="wrap">
+    <h2 data-i18n="f_title">Tout ce qu'il faut. Rien de plus.</h2>
+    <p class="sub" data-i18n="f_sub">Une interface pensée pour la salle : gros boutons, saisie rapide, aucune friction entre deux séries.</p>
+    <div class="features">
+      <article class="card"><div class="ico" aria-hidden="true">🏋️</div><h3 data-i18n="f1t">Suivi précis</h3><p data-i18n="f1d">Charge, répétitions et temps de repos pour chaque série. Valide d'un tap, le chrono de repos démarre tout seul.</p></article>
+      <article class="card"><div class="ico" aria-hidden="true">📈</div><h3 data-i18n="f2t">Historique semaine par semaine</h3><p data-i18n="f2d">Retrouve tes performances passées d'un geste de la main. La meilleure semaine de chaque exercice est mise en avant.</p></article>
+      <article class="card"><div class="ico" aria-hidden="true">📅</div><h3 data-i18n="f3t">Bilan &amp; calendrier</h3><p data-i18n="f3d">Séances réalisées, temps total, volume soulevé : compare ton mois au précédent en un coup d'œil.</p></article>
+      <article class="card"><div class="ico" aria-hidden="true">⏱️</div><h3 data-i18n="f4t">Chronos intégrés</h3><p data-i18n="f4d">Échauffement, repos entre séries et entre exercices, durée de séance, avec 5 sons d'alarme au choix.</p></article>
+      <article class="card"><div class="ico" aria-hidden="true">🎨</div><h3 data-i18n="f5t">À ton image</h3><p data-i18n="f5d">Mode clair ou sombre, couleurs personnalisables, et un tirage au sort d'harmonies de couleurs pour changer d'ambiance.</p></article>
+      <article class="card"><div class="ico" aria-hidden="true">🔒</div><h3 data-i18n="f6t">Privé et hors ligne</h3><p data-i18n="f6d">Aucune inscription, aucun compte. Tes données restent sur ton appareil, avec export et import de sauvegarde.</p></article>
+    </div>
+  </div>
+</section>
+
+<section id="demo" class="alt">
+  <div class="wrap">
+    <h2 data-i18n="d_title">Vois-la en action</h2>
+    <p class="sub" data-i18n="d_sub">Une séance complète en quelques secondes.</p>
+    <div class="video-box">
+      <!-- La vidéo sera déposée dans site/video/demo.mp4 (et demo.webm), poster : site/img/video-poster.jpg -->
+      <video id="demoVideo" controls playsinline preload="none" poster="img/app-series-dark.jpg" hidden>
+        <source src="video/demo.mp4" type="video/mp4">
+      </video>
+      <div class="video-ph" id="videoPh"><div><div class="play" aria-hidden="true">▶</div><span data-i18n="d_soon">Vidéo de démonstration bientôt disponible</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="captures">
+  <div class="wrap">
+    <h2 data-i18n="s_title">Un design qui se lit d'un coup d'œil</h2>
+    <p class="sub" data-i18n="s_sub">Sombre ou clair, avec tes couleurs.</p>
+    <div class="gallery">
+      <figure><div class="phone small"><div class="screen"><img src="img/app-series-dark.jpg" width="780" height="1688" loading="lazy" alt="Mode sombre"></div></div><figcaption data-i18n="s1">Mode sombre</figcaption></figure>
+      <figure><div class="phone small"><div class="screen"><img src="img/app-series-light.jpg" width="780" height="1688" loading="lazy" alt="Mode clair"></div></div><figcaption data-i18n="s2">Mode clair</figcaption></figure>
+      <figure><div class="phone small"><div class="screen"><img src="img/app-bilan-dark.jpg" width="780" height="1688" loading="lazy" alt="Bilan et calendrier"></div></div><figcaption data-i18n="s3">Bilan &amp; calendrier</figcaption></figure>
+      <figure><div class="phone small"><div class="screen"><img src="img/app-couleurs.jpg" width="780" height="1688" loading="lazy" alt="Couleurs au hasard"></div></div><figcaption data-i18n="s4">Tes couleurs, en un tap</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="installer" class="alt">
+  <div class="wrap">
+    <h2 data-i18n="i_title">Installe-la en 30 secondes</h2>
+    <p class="sub" data-i18n="i_sub">Pas de boutique d'applications : ouvre le lien, ajoute-la à ton écran d'accueil, c'est tout.</p>
+    <div class="steps">
+      <div class="card"><h3>Android (Chrome)</h3><ol data-i18n-html="i_android"><li>Ouvre le lien de l'app dans <b>Chrome</b>.</li><li>Touche le menu <b>⋮</b>.</li><li>Choisis <b>Ajouter à l'écran d'accueil</b>.</li></ol></div>
+      <div class="card"><h3>iPhone (Safari)</h3><ol data-i18n-html="i_ios"><li>Ouvre le lien de l'app dans <b>Safari</b>.</li><li>Touche le bouton <b>Partager</b>.</li><li>Choisis <b>Sur l'écran d'accueil</b>, puis <b>Ajouter</b>.</li></ol></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap" style="max-width:820px">
+    <h2 data-i18n="q_title">Questions fréquentes</h2>
+    <details><summary data-i18n="q1">Où sont stockées mes données ?</summary><p data-i18n="a1">Uniquement sur ton appareil. Il n'y a ni compte ni serveur : tu peux exporter une sauvegarde au format JSON et la réimporter quand tu veux.</p></details>
+    <details><summary data-i18n="q2">Ça marche sans connexion internet ?</summary><p data-i18n="a2">Oui. Une fois installée, l'application fonctionne hors ligne et se met à jour toute seule dès que tu as du réseau.</p></details>
+    <details><summary data-i18n="q3">Android et iPhone ?</summary><p data-i18n="a3">Les deux. L'app s'installe depuis le navigateur. Sur iPhone, les rappels en arrière-plan sont limités par Apple.</p></details>
+    <details><summary data-i18n="q4">Comment j'accède à l'app après l'achat ?</summary><p data-i18n="a4">Tu reçois un code d'accès par e-mail via Gumroad. Tu le saisis une fois dans l'application pour la débloquer.</p></details>
+    <details><summary data-i18n="q5">Quelles langues sont disponibles ?</summary><p data-i18n="a5">16 langues, dont le français, l'anglais, l'espagnol, l'allemand, l'italien, le portugais, le russe, le chinois, le japonais, le coréen, le turc, le polonais, l'arabe, l'hindi et l'indonésien.</p></details>
+  </div>
+</section>
+
+<div class="final">
+  <div class="wrap">
+    <h2 data-i18n="z_title">Prêt à arrêter de te compliquer la muscu ?</h2>
+    <p data-i18n="z_sub">Une app simple, rapide, et qui reste à toi.</p>
+    <a class="btn primary" data-buy href="#" data-i18n="cta">Obtenir OVERBOLT</a>
+  </div>
+</div>
+</main>
+
+<footer>
+  <div class="wrap row">
+    <span>OVERBOLT | NO BS © 2026 Schmitt — <span data-i18n="rights">Tous droits réservés.</span></span>
+    <span data-i18n="made">Fait avec soin, sans blabla.</span>
+  </div>
+</footer>
+
+<script>
+/* ⚠️ À remplacer par le lien Gumroad réel du produit */
+var BUY_URL = "https://michaelwave210.gumroad.com/l/YOUR_EN_PERMALINK";
+
+var I18N = {
+ fr:{},
+ en:{
+  nav_features:"Features",nav_demo:"Demo",nav_install:"Install",cta_short:"Get it",
+  eyebrow:"Workout tracking app",
+  h1:"Your workout log.<br><em>No BS.</em>",
+  lead:"Workouts, sets, weights, reps and rest: log in seconds, see your progress week after week. Everything stays on your phone, even offline.",
+  cta:"Get OVERBOLT",cta_demo:"▶ Watch the demo",
+  chip1:"Works offline",chip2:"Private data",chip3:"Android & iPhone",chip4:"16 languages",
+  f_title:"Everything you need. Nothing more.",f_sub:"An interface built for the gym: big buttons, fast input, no friction between sets.",
+  f1t:"Precise tracking",f1d:"Weight, reps and rest time for every set. Tap to validate, the rest timer starts by itself.",
+  f2t:"Week-by-week history",f2d:"Find your past performance with a swipe. Your best week for each exercise is highlighted.",
+  f3t:"Stats & calendar",f3d:"Sessions done, total time, volume lifted: compare your month with the previous one at a glance.",
+  f4t:"Built-in timers",f4d:"Warm-up, rest between sets and exercises, workout duration, with 5 alarm sounds to choose from.",
+  f5t:"Make it yours",f5d:"Light or dark mode, custom colors, and a random color-harmony draw to change the mood.",
+  f6t:"Private & offline",f6d:"No sign-up, no account. Your data stays on your device, with backup export and import.",
+  d_title:"See it in action",d_sub:"A full workout in a few seconds.",d_soon:"Demo video coming soon",
+  s_title:"A design you read at a glance",s_sub:"Dark or light, in your colors.",
+  s1:"Dark mode",s2:"Light mode",s3:"Stats & calendar",s4:"Your colors, one tap away",
+  i_title:"Install it in 30 seconds",i_sub:"No app store: open the link, add it to your home screen, done.",
+  i_android:"<li>Open the app link in <b>Chrome</b>.</li><li>Tap the <b>⋮</b> menu.</li><li>Choose <b>Add to Home screen</b>.</li>",
+  i_ios:"<li>Open the app link in <b>Safari</b>.</li><li>Tap the <b>Share</b> button.</li><li>Choose <b>Add to Home Screen</b>, then <b>Add</b>.</li>",
+  q_title:"Frequently asked questions",
+  q1:"Where is my data stored?",a1:"Only on your device. There is no account and no server: you can export a JSON backup and re-import it anytime.",
+  q2:"Does it work without internet?",a2:"Yes. Once installed, the app works offline and updates itself as soon as you have a connection.",
+  q3:"Android and iPhone?",a3:"Both. The app installs from your browser. On iPhone, background reminders are limited by Apple.",
+  q4:"How do I access the app after buying?",a4:"You receive an access code by email via Gumroad. Enter it once in the app to unlock it.",
+  q5:"Which languages are available?",a5:"16 languages, including French, English, Spanish, German, Italian, Portuguese, Russian, Chinese, Japanese, Korean, Turkish, Polish, Arabic, Hindi and Indonesian.",
+  z_title:"Ready to stop overcomplicating your training?",z_sub:"A simple, fast app that stays yours.",
+  rights:"All rights reserved.",made:"Built with care, no BS."
+ }
+};
+var FR = {};
+document.querySelectorAll("[data-i18n],[data-i18n-html]").forEach(function(el){
+  var k = el.getAttribute("data-i18n") || el.getAttribute("data-i18n-html");
+  FR[k] = el.hasAttribute("data-i18n-html") ? el.innerHTML : el.textContent;
+});
+function setLang(lg){
+  var d = lg === "en" ? I18N.en : FR;
+  document.documentElement.lang = lg;
+  document.querySelectorAll("[data-i18n]").forEach(function(el){ var k=el.getAttribute("data-i18n"); if(d[k]!=null) el.textContent=d[k]; });
+  document.querySelectorAll("[data-i18n-html]").forEach(function(el){ var k=el.getAttribute("data-i18n-html"); if(d[k]!=null) el.innerHTML=d[k]; });
+  document.querySelectorAll(".lang button").forEach(function(b){ b.setAttribute("aria-pressed", b.getAttribute("data-lang")===lg ? "true":"false"); });
+  try{ localStorage.setItem("ob_site_lang", lg); }catch(e){}
+}
+document.querySelectorAll(".lang button").forEach(function(b){ b.addEventListener("click", function(){ setLang(b.getAttribute("data-lang")); }); });
+document.querySelectorAll("[data-buy]").forEach(function(a){ a.href = BUY_URL; a.rel = "noopener"; });
+var saved = null; try{ saved = localStorage.getItem("ob_site_lang"); }catch(e){}
+setLang(saved || ((navigator.language||"fr").toLowerCase().indexOf("fr")===0 ? "fr" : "en"));
+
+/* vidéo : n'affiche le lecteur que si le fichier existe réellement */
+(function(){
+  var v = document.getElementById("demoVideo"), ph = document.getElementById("videoPh");
+  fetch("video/demo.mp4", {method:"HEAD"}).then(function(r){
+    if(r.ok){ v.hidden = false; ph.hidden = true; }
+  }).catch(function(){});
+})();
+</script>
+</body>
+</html>
