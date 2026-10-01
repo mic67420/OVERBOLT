@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.34</title>
+<title>OVERBOLT | NO BS v3.35</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -124,22 +124,23 @@ h1 .no-bs{font-weight:900;color:#fff;}
 .day-row{display:flex;gap:6px;overflow-x:auto;padding:6px 0 14px;}
 .day-pill{
   position:relative;
-  flex:0 0 auto;border:1px solid var(--border);background:var(--panel);color:var(--text-dim);
-  font-family:var(--font-display);font-weight:600;font-size:.72rem;letter-spacing:.02em;
+  flex:0 0 auto;border:1px solid var(--border);background:var(--panel);color:var(--ink-base);
+  font-family:var(--font-display);font-weight:600;font-size:.92rem;letter-spacing:.02em;
   padding:8px 14px 10px;border-radius:14px;cursor:pointer;transition:all .15s;white-space:nowrap;
   display:flex;flex-direction:column;align-items:center;gap:2px;min-height:66px;justify-content:center;
 }
-.day-pill .dp-sub{font-family:var(--font-body);font-weight:500;font-size:.58rem;color:var(--text-dim2);letter-spacing:.01em;min-height:.9em;}
-.day-pill .dp-sub.dp-sub-empty{font-size:.72rem;letter-spacing:.14em;color:var(--text-dim2);opacity:.6;}
+.day-pill .dp-sub{font-family:var(--font-body);font-weight:500;font-size:.72rem;color:var(--ink-base);opacity:.8;letter-spacing:.01em;min-height:.9em;}
+.day-pill .dp-sub.dp-sub-empty{font-size:.85rem;letter-spacing:.14em;color:var(--ink-base);opacity:.6;}
 .day-pill.active{
-  color:var(--neon); background:var(--neon-soft); border-color:var(--neon); border-width:1.5px;
+  color:var(--ink-active); background:var(--neon-soft); border-color:var(--neon); border-width:1.5px;
 }
-.day-pill.active .dp-sub{color:var(--neon);opacity:.75;}
+.day-pill.active .dp-sub{color:var(--ink-active);opacity:.85;}
 .dp-live{
-  display:block;font-family:var(--font-display);font-size:.5rem;font-weight:800;
-  letter-spacing:.06em;color:var(--neon);margin-bottom:1px;
+  display:block;font-family:var(--font-display);font-size:.62rem;font-weight:800;
+  letter-spacing:.06em;color:var(--ink-active);margin-bottom:1px;
 }
-.day-pill.day-done{background:var(--serie-soft);border-color:var(--serie);}
+.day-pill.day-done{background:var(--serie-soft);border-color:var(--serie);color:var(--ink-done);}
+.day-pill.day-done .dp-sub,.day-pill.day-done .dp-live{color:var(--ink-done);}
 .day-pill .dp-check{
   position:static;margin-top:3px;width:24px;height:24px;border-radius:50%;
   background:rgba(255,255,255,.06);border:1.5px solid var(--border-hi);color:var(--bg-0);
@@ -168,7 +169,7 @@ h1 .no-bs{font-weight:900;color:#fff;}
 .view-tabs{display:flex;gap:6px;margin-top:14px;padding-bottom:10px;}
 .view-tab{
   flex:1;border:1px solid var(--border);background:var(--panel);color:var(--text-dim);
-  font-family:var(--font-display);font-weight:600;font-size:.7rem;letter-spacing:.02em;
+  font-family:var(--font-display);font-weight:600;font-size:.88rem;letter-spacing:.02em;
   padding:9px 6px;border-radius:10px;cursor:pointer;text-align:center;transition:all .15s;
 }
 .view-tab .vt-icon{font-size:3rem;vertical-align:middle;line-height:1;}
@@ -176,7 +177,7 @@ h1 .no-bs{font-weight:900;color:#fff;}
 button.view-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
 .view-tab .vt-icon-svg{display:inline-block;font-size:3rem;width:1em;height:1em;vertical-align:middle;color:inherit;}
 .view-tab.active{
-  color:var(--neon); background:var(--neon-soft); border:1.5px solid var(--neon);
+  color:var(--ink-active); background:var(--neon-soft); border:1.5px solid var(--neon);
 }
 .view-tab.color-random-tile{padding:0;position:relative;overflow:hidden;}
 .vt-random-btn{
@@ -844,7 +845,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.34</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.35</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -2791,6 +2792,25 @@ function setColorGroup(varName, hex, softAlpha, glowAlpha){
   root.setProperty(varName+"-soft", rgbaStr(hex, softAlpha));
   root.setProperty(varName+"-glow", rgbaStr(hex, glowAlpha));
 }
+/* Texte des tuiles : noir ou blanc absolu, choisi d'après la couleur réelle du fond translucide
+   (couleur tirée × transparence, mélangée au fond du thème) pour le meilleur contraste WCAG. */
+function lin(v){ v/=255; return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4); }
+function relLum(c){ return 0.2126*lin(c.r) + 0.7152*lin(c.g) + 0.0722*lin(c.b); }
+function mixRgb(base, top, a){ return { r:base.r*(1-a)+top.r*a, g:base.g*(1-a)+top.g*a, b:base.b*(1-a)+top.b*a }; }
+function inkFor(bg){
+  var L = relLum(bg);
+  return ((L + 0.05) / 0.05) >= (1.05 / (L + 0.05)) ? "#000" : "#fff"; // contraste avec noir vs avec blanc
+}
+function applyInk(s, bgMult){
+  var t = THEMES[s.theme] || THEMES.dark;
+  var pm = /rgba\((\d+),(\d+),(\d+),([\d.]+)\)/.exec(t.panel.replace(/\s/g,""));
+  var base = mixRgb(hexToRgb(t.bg0), {r:+pm[1], g:+pm[2], b:+pm[3]}, +pm[4]);
+  var a = Math.min(1, 0.28 * bgMult);
+  var root = document.documentElement.style;
+  root.setProperty("--ink-base", s.theme === "light" ? "#000" : "#fff");
+  root.setProperty("--ink-active", inkFor(mixRgb(base, hexToRgb(boostColor(s.colorPrincipal, s.colorIntensity)), a)));
+  root.setProperty("--ink-done", inkFor(mixRgb(base, hexToRgb(boostColor(s.colorSerie, s.colorIntensity)), a)));
+}
 function applyTheme(name){
   var t = THEMES[name] || THEMES.dark;
   document.documentElement.setAttribute("data-theme", THEMES[name] ? name : "dark");
@@ -2822,6 +2842,7 @@ function applySettings(){
   setColorGroup("--addrm", pAddRemove, 0.28*bgMult, 0.55*mult);
   document.documentElement.style.setProperty("--danger-soft", rgbaStr("#ff5470", 0.28*bgMult));
   applyTheme(s.theme);
+  applyInk(s, bgMult);
 }
 
 /* ================= état ================= */
