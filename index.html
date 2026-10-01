@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.31</title>
+<title>OVERBOLT | NO BS v3.32</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -229,8 +229,10 @@ html[data-theme="dark"] :is(.day-pill,.day-add,.day-remove,.view-tab,.banner,.ex
 }
 .banner .b-left{display:flex;flex-direction:column;gap:2px;}
 .banner .b-title{font-family:var(--font-display);font-weight:700;font-size:.82rem;letter-spacing:.05em;color:var(--text);}
-.banner .warmup-icon{font-size:1.4rem;vertical-align:middle;line-height:1;display:inline-flex;}
+.banner .b-main{display:flex;align-items:center;gap:12px;min-width:0;}
+.banner .warmup-icon{font-size:3.6rem;line-height:1;display:inline-flex;flex:0 0 auto;}
 .banner .warmup-icon svg{width:1em;height:1em;filter:drop-shadow(0 0 4px #7a3bff);}
+.banner.warmup{padding-top:8px;padding-bottom:8px;}
 .banner .b-sub{font-family:var(--font-body);font-size:.62rem;color:var(--text-dim);}
 .banner .b-time{font-family:var(--font-digit);font-size:1.1rem;color:var(--warmup);text-shadow:0 0 8px var(--warmup-glow);}
 .banner.warmup{background:var(--warmup-soft);border:1.5px solid var(--warmup);}
@@ -841,7 +843,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.31</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.32</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -872,9 +874,10 @@ html.licensed #licenseGate{ display:none !important; }
 
   <div class="panel" id="panelSeries">
     <div class="banner warmup glass" id="warmupBanner" data-role="warmup-toggle">
-      <div class="b-left">
-        <span class="b-title"><span class="warmup-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="uvFlameGrad" x1="12" y1="22" x2="12" y2="2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2ad4ff"/><stop offset=".45" stop-color="#6a3bff"/><stop offset="1" stop-color="#c026ff"/></linearGradient></defs><path fill="url(#uvFlameGrad)" d="M12 2c1 3-2 4.5-2 7.5 0 1.5 1 2.5 2 2.5s2-1 2-2.5c0-1 -.5-1.7-.5-1.7 2.5 1.2 4.5 4 4.5 7.2 0 4-3.1 7-6 7s-7-2.5-7-7.5C5 11 6.5 8 9 6c-.3 1.5 .3 2.5 1 2.5 .8 0 1-1 .7-2C10.2 4.5 11 3 12 2z"/></svg></span> <span data-i18n="warmup_title">ÉCHAUFFEMENT</span></span>
+      <div class="b-main"><span class="warmup-icon"><svg viewBox="0 0 24 24" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="uvFlameGrad" x1="12" y1="22" x2="12" y2="2" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2ad4ff"/><stop offset=".45" stop-color="#6a3bff"/><stop offset="1" stop-color="#c026ff"/></linearGradient></defs><path fill="url(#uvFlameGrad)" stroke="#000" stroke-width=".7" stroke-linejoin="round" d="M12 2c1 3-2 4.5-2 7.5 0 1.5 1 2.5 2 2.5s2-1 2-2.5c0-1 -.5-1.7-.5-1.7 2.5 1.2 4.5 4 4.5 7.2 0 4-3.1 7-6 7s-7-2.5-7-7.5C5 11 6.5 8 9 6c-.3 1.5 .3 2.5 1 2.5 .8 0 1-1 .7-2C10.2 4.5 11 3 12 2z"/></svg></span><div class="b-left">
+        <span class="b-title"><span data-i18n="warmup_title">ÉCHAUFFEMENT</span></span>
         <span class="b-sub" id="warmupSub">appuyer pour lancer 5:00</span>
+      </div>
       </div>
       <span class="b-time">5:00</span>
     </div>
