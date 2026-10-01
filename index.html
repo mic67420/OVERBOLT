@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.36</title>
+<title>OVERBOLT | NO BS v3.37</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -738,14 +738,16 @@ html.licensed #licenseGate{ display:none !important; }
     <input id="lgInput" class="lg-input" type="text" placeholder="XXXXXXXX-XXXXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false">
     <button id="lgSubmit" class="lg-btn">Unlock</button>
     <div id="lgError" class="lg-error"></div>
-    <a class="lg-buy" id="lgBuy" href="https://michaelwave210.gumroad.com/l/YOUR_EN_PERMALINK" target="_blank" rel="noopener">No code yet? Buy the app →</a>
+    <a class="lg-buy" id="lgBuy" href="https://michaelwave210.gumroad.com/l/gktnl" target="_blank" rel="noopener">No code yet? Buy the app →</a>
   </div>
 </div>
 
 <script>
 (function(){
   // ⚠️ Remplacer par le permalink exact du produit anglais sur Gumroad une fois créé
-  var GUMROAD_PRODUCT_PERMALINK = "YOUR_EN_PERMALINK"; // ⚠️ à remplacer une fois le produit Gumroad anglais créé
+  var GUMROAD_PRODUCT_PERMALINK = "gktnl"; // produit Gumroad « OVERBOLT | SANS BLAGUES » (michaelwave210.gumroad.com/l/gktnl)
+  // Gumroad exige l'identifiant du produit (product_id) pour les produits récents : s'il est renseigné ici, il est utilisé à la place du permalink.
+  var GUMROAD_PRODUCT_ID = "";
 
   // Textes bilingues de l'écran de verrouillage (détection langue navigateur,
   // indépendante du réglage de langue interne à l'app qui n'existe pas encore
@@ -787,7 +789,7 @@ html.licensed #licenseGate{ display:none !important; }
     btn.textContent = GATE_TXT.verifying;
 
     var body = new URLSearchParams();
-    body.set('product_permalink', GUMROAD_PRODUCT_PERMALINK);
+    if(GUMROAD_PRODUCT_ID) body.set('product_id', GUMROAD_PRODUCT_ID); else body.set('product_permalink', GUMROAD_PRODUCT_PERMALINK);
     body.set('license_key', code);
     body.set('increment_uses_count', 'false');
 
@@ -845,7 +847,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.36</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.37</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
