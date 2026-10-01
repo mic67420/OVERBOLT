@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.29</title>
+<title>OVERBOLT | NO BS v3.30</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -172,7 +172,8 @@ h1 .no-bs{font-weight:900;color:#fff;}
   padding:9px 6px;border-radius:10px;cursor:pointer;text-align:center;transition:all .15s;
 }
 .view-tab .vt-icon{font-size:3rem;vertical-align:middle;line-height:1;}
-.view-tab .vt-icon-img{height:5.2rem;width:auto;vertical-align:middle;object-fit:contain;border-radius:4px;margin-top:-1rem;margin-bottom:-1rem;}
+.view-tab .vt-icon-img{height:5.2rem;width:auto;vertical-align:middle;object-fit:contain;border-radius:4px;margin-top:-1rem;margin-bottom:0;}
+button.view-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
 .view-tab .vt-icon-svg{display:inline-block;font-size:3rem;width:1em;height:1em;vertical-align:middle;color:inherit;}
 .view-tab.active{
   color:var(--neon); background:var(--neon-soft); border:1.5px solid var(--neon);
@@ -190,6 +191,8 @@ h1 .no-bs{font-weight:900;color:#fff;}
   touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:opacity .15s,color .15s;
 }
 .vt-theme-btn svg{width:100%;height:100%;display:block;}
+/* aucune animation de couleur/ombre/fond : les changements de thème et de couleurs sont instantanés */
+*,*::before,*::after{transition-property:transform,opacity !important;}
 .vt-sun{top:5px;left:5px;}
 .vt-moon{bottom:5px;right:5px;}
 html[data-theme="light"] .vt-sun,html[data-theme="dark"] .vt-moon{color:var(--neon);border-color:var(--neon);opacity:1;}
@@ -838,7 +841,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.29</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.30</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -4291,15 +4294,17 @@ function updateRandomizeUndoBtn(){
   btn.disabled = !hasHistory;
   btn.classList.toggle("has-history", hasHistory);
 }
-var colorFastTimer = null;
-function colorFastOn(){
-  document.documentElement.classList.add("color-fast");
-  clearTimeout(colorFastTimer);
-  colorFastTimer = setTimeout(function(){ document.documentElement.classList.remove("color-fast"); }, 300);
-}
 var lastRandPointer = 0;
+var saveColorsTimer = null;
+function saveColorsLater(){
+  dataDirty = true;
+  clearTimeout(saveColorsTimer);
+  saveColorsTimer = setTimeout(function(){
+    var run = function(){ saveColorsTimer = null; saveState(); };
+    if(window.requestIdleCallback) requestIdleCallback(run, {timeout:2000}); else run();
+  }, 1200); // la sérialisation complète du state n'a lieu qu'une fois les taps terminés, et en temps libre
+}
 function randomizeAllColors(){
-  colorFastOn();
   var snapshot = {};
   COLOR_CATEGORIES.forEach(function(k){ snapshot[k] = state.settings[k]; });
   colorRandomHistory.push(snapshot);
@@ -4310,20 +4315,19 @@ function randomizeAllColors(){
     syncColorInputs(k, picked[i]);
   });
   applySettings();
-  saveStateDebounced(); // écriture différée : on peut taper très vite sans ralentir
+  saveColorsLater();
   updateRandomizeUndoBtn();
   buzz([15]);
 }
 function undoRandomizeColors(){
   var snapshot = colorRandomHistory.pop();
   if(!snapshot) return;
-  colorFastOn();
   COLOR_CATEGORIES.forEach(function(k){
     state.settings[k] = snapshot[k];
     syncColorInputs(k, snapshot[k]);
   });
   applySettings();
-  saveStateDebounced();
+  saveColorsLater();
   updateRandomizeUndoBtn();
   buzz([15]);
 }
