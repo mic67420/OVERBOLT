@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.33</title>
+<title>OVERBOLT | NO BS v3.34</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -232,6 +232,7 @@ html[data-theme="dark"] :is(.day-pill,.day-add,.day-remove,.view-tab,.banner,.ex
 .banner .b-main{display:flex;align-items:center;gap:12px;min-width:0;}
 .banner .warmup-icon{font-size:3.6rem;line-height:1;display:inline-flex;flex:0 0 auto;}
 .banner .warmup-icon img{height:1em;width:auto;display:block;filter:drop-shadow(0 0 4px #7a3bff);}
+.warmup-icon img,.view-tab img{pointer-events:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-user-drag:none;}
 .banner.warmup{padding-top:8px;padding-bottom:8px;}
 .banner .b-sub{font-family:var(--font-body);font-size:.62rem;color:var(--text-dim);}
 .banner .b-time{font-family:var(--font-digit);font-size:1.1rem;color:var(--warmup);text-shadow:0 0 8px var(--warmup-glow);}
@@ -843,7 +844,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.33</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.34</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -3447,6 +3448,7 @@ function startSpringBackLocal(el){
 function scheduleSpringBackLocal(el){
   el._springTimer = setTimeout(function(){
     el._springTimer = null;
+    if(el._touching) return; // retouché pendant l'attente : pas de ressort (touchend le relancera)
     startSpringBackLocal(el);
   }, SPRING_RELEASE_DELAY_MS);
   springLog(el, "minuteur programmé ("+SPRING_RELEASE_DELAY_MS+"ms)");
@@ -3461,6 +3463,7 @@ function scheduleMomentumCheck(el){
   el._momentumTimer = setTimeout(function(){
     el._momentumTimer = null;
     if(!el._momentumWatchActive) return;
+    if(el._touching){ scheduleMomentumCheck(el); return; } // doigt toujours posé : on gèle
     el._momentumWatchActive = false;
     springLog(el, "défilement inertiel terminé");
     scheduleSpringBackLocal(el);
@@ -3490,6 +3493,17 @@ function initSeriesScroller(el){
   }
   el.addEventListener("pointerup", onRelease, {passive:true});
   el.addEventListener("pointercancel", onRelease, {passive:true});
+
+  el.addEventListener("touchstart", function(){
+    el._touching = true;
+    interruptSpringLocal(el);
+  }, {passive:true});
+  function onTouchEnd(){
+    el._touching = false;
+    if(!el._momentumWatchActive && !el._springTimer && !el._isSpringAnimating) watchMomentumThenSpring(el);
+  }
+  el.addEventListener("touchend", onTouchEnd, {passive:true});
+  el.addEventListener("touchcancel", onTouchEnd, {passive:true});
 
   el.addEventListener("scroll", function(){
     if(el._momentumWatchActive) scheduleMomentumCheck(el);
