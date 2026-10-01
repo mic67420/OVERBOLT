@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.27</title>
+<title>OVERBOLT | NO BS v3.28</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -831,7 +831,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.27</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.28</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -4243,11 +4243,34 @@ function setCategoryColor(target, hex){
    state.settings comme une couleur choisie normalement (même mécanisme que le
    sélecteur manuel), donc aucun changement du format de sauvegarde. */
 var colorRandomHistory = [];
-function randomHexVivid(){
-  var h = Math.random() * 360;
-  var s = 65 + Math.random() * 25; // 65-90% : couleurs franches, jamais délavées
-  var l = 45 + Math.random() * 15; // 45-60% : ni trop sombre ni trop pâle
-  return hslToHex(h, s, l);
+/* Harmonies de la roue chromatique : chaque tirage choisit un schéma au hasard et une teinte
+   de départ, puis déduit les 4 couleurs par écarts de teinte (en degrés). */
+var COLOR_HARMONIES = [
+  [0, 30, 60, -30],     // analogue
+  [0, 180, 15, 195],    // complémentaire
+  [0, 120, 240, 20],    // triadique
+  [0, 150, 210, -20],   // complémentaire scindée
+  [0, 90, 180, 270],    // carré (tétradique)
+  [0, 60, 180, 240],    // rectangle (tétradique)
+  [0, 0, 0, 0]          // monochrome (seule la luminosité varie)
+];
+function shuffleInPlace(a){
+  for(var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+function harmonyHexes(){
+  var offsets = COLOR_HARMONIES[Math.floor(Math.random() * COLOR_HARMONIES.length)];
+  var mono = (offsets[1] === 0 && offsets[2] === 0);
+  var base = Math.random() * 360;
+  var hexes = offsets.map(function(off, i){
+    var h = (base + off + 360) % 360;
+    var s = 68 + Math.random() * 20;                              // 68-88% : couleurs franches
+    var l = mono ? [42, 52, 62, 71][i] : 48 + Math.random() * 12; // 48-60% (monochrome : 4 paliers)
+    return hslToHex(h, s, l);
+  });
+  return shuffleInPlace(hexes); // les 4 rôles (principale, échauffement, série, +/-) reçoivent un ordre aléatoire
 }
 function updateRandomizeUndoBtn(){
   var btn = document.getElementById("colorRandomUndoBtn");
@@ -4269,10 +4292,10 @@ function randomizeAllColors(){
   COLOR_CATEGORIES.forEach(function(k){ snapshot[k] = state.settings[k]; });
   colorRandomHistory.push(snapshot);
   if(colorRandomHistory.length > 30) colorRandomHistory.shift(); // pile bornée, pas de fuite mémoire à force de taper
-  COLOR_CATEGORIES.forEach(function(k){
-    var hex = randomHexVivid();
-    state.settings[k] = hex;
-    syncColorInputs(k, hex);
+  var picked = harmonyHexes();
+  COLOR_CATEGORIES.forEach(function(k, i){
+    state.settings[k] = picked[i];
+    syncColorInputs(k, picked[i]);
   });
   applySettings();
   saveStateDebounced(); // écriture différée : on peut taper très vite sans ralentir
