@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.43</title>
+<title>OVERBOLT | NO BS v3.44</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -92,7 +92,7 @@ header{
 h1{margin:0;font-family:var(--font-display);font-weight:800;font-size:1.14rem;letter-spacing:.06em;color:var(--text);text-shadow:0 0 10px var(--neon-soft), 0 0 22px var(--neon-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
 h1.long-title{font-size:.74rem;letter-spacing:.02em;}
 h1 .ver{color:var(--neon);font-family:var(--font-digit);font-size:.66rem;vertical-align:super;text-shadow:0 0 8px var(--neon-glow);margin-left:2px;}
-h1 .no-bs{font-weight:900;color:#fff;}
+h1 .no-bs{font-weight:900;color:var(--ink-base);}
 .head-btns{display:flex;align-items:center;gap:6px;}
 .btn-icon{
   border:1px solid var(--border-hi);border-radius:10px;width:40px;height:40px;
@@ -143,14 +143,14 @@ h1 .no-bs{font-weight:900;color:#fff;}
 .day-pill.day-done .dp-sub,.day-pill.day-done .dp-live{color:var(--ink-done);}
 .day-pill .dp-check{
   position:static;margin-top:3px;width:24px;height:24px;border-radius:50%;
-  background:rgba(255,255,255,.06);border:1px solid var(--ink-base);color:var(--bg-0);
+  background:rgba(255,255,255,.06);border:1px solid var(--ink-base);color:var(--ink-base);
   font-size:.8rem;font-weight:900;cursor:default;
   display:flex;align-items:center;justify-content:center;line-height:1;
   transition:all .15s;
 }
 .day-pill .dp-check.dp-check-done{
   width:24px;height:24px;font-size:.9rem;
-  background:var(--serie);border-color:var(--ink-base);
+  background:var(--serie);border-color:var(--ink-base);color:var(--ink-on-serie,var(--ink-base));
   box-shadow:0 0 calc(var(--halo-mult) * 4px) var(--serie-glow);
 }
 .day-add{
@@ -391,11 +391,11 @@ html[data-theme="dark"] :is(.day-pill,.day-add,.day-remove,.view-tab,.banner,.ex
 
 .validate-btn{
   width:40px;height:40px;border-radius:50%;margin-top:1px;background:rgba(255,255,255,.03);
-  border:1.5px solid var(--border-hi);color:var(--text-dim);font-size:1.15rem;
+  border:1.5px solid var(--border-hi);color:var(--ink-base);font-size:1.15rem;
   display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;
 }
 .validate-btn:active{transform:scale(.9);}
-.validate-btn.done{background:var(--serie-soft);border-color:var(--serie);color:var(--serie);box-shadow:0 0 calc(var(--halo-mult) * 6px) var(--serie-glow), 0 0 calc(var(--halo-mult) * 13px) var(--serie-soft);}
+.validate-btn.done{background:var(--serie-soft);border-color:var(--serie);color:var(--ink-base);box-shadow:0 0 calc(var(--halo-mult) * 6px) var(--serie-glow), 0 0 calc(var(--halo-mult) * 13px) var(--serie-soft);}
 
 /* ---------- vue exercices ---------- */
 .exo-toolbar{padding:6px 10px 10px;}
@@ -848,7 +848,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.43</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.44</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -2813,6 +2813,7 @@ function applyInk(s, bgMult){
   root.setProperty("--ink-base", s.theme === "light" ? "#000" : "#fff");
   root.setProperty("--ink-active", inkFor(mixRgb(base, hexToRgb(boostColor(s.colorPrincipal, s.colorIntensity)), a)));
   root.setProperty("--ink-done", inkFor(mixRgb(base, hexToRgb(boostColor(s.colorSerie, s.colorIntensity)), a)));
+  root.setProperty("--ink-on-serie", inkFor(hexToRgb(boostColor(s.colorSerie, s.colorIntensity))));
 }
 function applyTheme(name){
   var t = THEMES[name] || THEMES.dark;
