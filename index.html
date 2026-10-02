@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.38</title>
+<title>OVERBOLT | NO BS v3.39</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -501,6 +501,8 @@ html[data-theme="dark"] :is(.day-pill,.day-add,.day-remove,.view-tab,.banner,.ex
   border:1px solid var(--border);
 }
 .cal-cell.empty{border:none;background:none;}
+.cal-cell{position:relative;}
+.cal-cell .cal-count{position:absolute;top:2px;right:3px;font-size:.55rem;line-height:1;font-weight:800;color:var(--warmup);letter-spacing:0;}
 .cal-cell.trained{background:var(--warmup-soft);border-color:var(--warmup);color:var(--warmup);font-weight:700;box-shadow:0 0 calc(var(--halo-mult) * 4px) var(--warmup-soft);}
 .cal-cell.today{border-color:var(--warmup);box-shadow:0 0 0 1px var(--warmup) inset;}
 
@@ -847,7 +849,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.38</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.39</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -3624,20 +3626,30 @@ function renderSynth(){
   var calDateObj = new Date(now.getFullYear(), now.getMonth() + calViewOffset, 1);
   var calMonth = { y: calDateObj.getFullYear(), m: calDateObj.getMonth() };
 
+  // Les cartes de statistiques suivent le mois affiché dans le calendrier (◀ ▶), la comparaison
+  // se fait avec le mois qui le précède ; seul le libellé "Ce mois-ci" reste réservé au mois réel.
+  var realMonth = thisMonth;
+  thisMonth = { y: calMonth.y, m: calMonth.m };
+  prevDate = new Date(calMonth.y, calMonth.m - 1, 1);
+  prevMonth = { y: prevDate.getFullYear(), m: prevDate.getMonth() };
+
   // collecte de toutes les semaines ayant une session (début renseigné), toutes séances confondues
   var allSessions = [];
   state.dayOrder.forEach(function(d){
     var day = state.days[d];
     day.weeks.forEach(function(week){
       if(week.session && week.session.startAt){
-        var volume = 0;
+        var volume = 0, validatedCount = 0;
         week.rows.forEach(function(r){
           r.series.forEach(function(serie){
             if(serie.validated){
+              validatedCount++;
               volume += (parseFloat(serie.charge)||0) * (parseFloat(serie.reps)||0);
             }
           });
         });
+        // séance "fantôme" : marquée terminée sans aucune série validée (anciens bugs) -> ne compte pas
+        if(week.session.endAt && validatedCount === 0) return;
         // repli sur la dernière activité si "FIN DE SÉANCE" n'a jamais été pressé
         var effectiveEnd = week.session.endAt || week.session.lastActivityAt || null;
         allSessions.push({ day:d, week:week, startAt:new Date(week.session.startAt), endAt: effectiveEnd?new Date(effectiveEnd):null, confirmed: !!week.session.endAt, volume:volume });
@@ -3667,7 +3679,7 @@ function renderSynth(){
   var daysInMonth = new Date(calMonth.y, calMonth.m+1, 0).getDate();
   var calStats = statsForMonth(calMonth.y, calMonth.m);
   var trainedDates = {};
-  calStats.sessions.forEach(function(s){ trainedDates[s.startAt.getDate()] = true; });
+  calStats.sessions.forEach(function(s){ var dn = s.startAt.getDate(); trainedDates[dn] = (trainedDates[dn] || 0) + 1; });
 
   // date du lundi de la toute première ligne affichée (peut être dans le mois précédent)
   var gridStart = new Date(calMonth.y, calMonth.m, 1 - startOffset);
@@ -3689,7 +3701,8 @@ function renderSynth(){
       } else {
         var isToday = (dayNum===now.getDate() && calMonth.m===now.getMonth() && calMonth.y===now.getFullYear());
         var trained = trainedDates[dayNum] ? "trained" : "";
-        calHtml += '<div class="cal-cell '+trained+' '+(isToday?'today':'')+'">'+dayNum+'</div>';
+        var cnt = trainedDates[dayNum] || 0;
+        calHtml += '<div class="cal-cell '+trained+' '+(isToday?'today':'')+'"'+(cnt>1 ? ' title="'+cnt+'"' : '')+'>'+dayNum+(cnt>1 ? '<span class="cal-count">×'+cnt+'</span>' : '')+'</div>';
       }
     }
   }
@@ -3729,7 +3742,7 @@ function renderSynth(){
     });
   });
 
-  var isCalCurrentMonth = (calMonth.y === thisMonth.y && calMonth.m === thisMonth.m);
+  var isCalCurrentMonth = (calMonth.y === realMonth.y && calMonth.m === realMonth.m);
   var html = '' +
   '<div class="synth-card glass">' +
     '<h3 class="cal-nav-head"><button class="cal-nav-btn" data-role="cal-prev" title="'+t("bilan_prev_month")+'">◀</button>' +
@@ -3738,7 +3751,7 @@ function renderSynth(){
     calHtml +
   '</div>' +
   '<div class="synth-card glass">' +
-    '<h3>'+t("bilan_this_month")+'</h3>' +
+    '<h3>'+(isCalCurrentMonth ? t("bilan_this_month") : MONTH_NAMES[calMonth.m]+' '+calMonth.y)+'</h3>' +
     '<div class="synth-grid">' +
       '<div class="synth-stat"><span class="s-val">'+curStats.count+'</span><span class="s-lbl">'+t("bilan_sessions")+'</span>'+fmtDelta(curStats.count,prevStats.count)+'</div>' +
       '<div class="synth-stat"><span class="s-val">'+formatDuration(curStats.totalMs)+'</span><span class="s-lbl">'+t("bilan_total_time")+'</span>'+fmtDelta(curStats.totalMs,prevStats.totalMs)+'</div>' +
