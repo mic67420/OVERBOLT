@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.46</title>
+<title>OVERBOLT | NO BS v3.47</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -398,7 +398,8 @@ html[data-theme="dark"] :is(.day-pill,.day-add,.day-remove,.view-tab,.banner,.ex
   display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;
 }
 .validate-btn:active{transform:scale(.9);}
-.validate-btn.done{background:var(--valid);border-color:var(--valid);color:var(--ink-on-valid,var(--ink-base));box-shadow:0 0 calc(var(--halo-mult) * 6px) var(--valid-glow), 0 0 calc(var(--halo-mult) * 13px) var(--valid-soft);}
+.validate-btn .vg-out{stroke:var(--ink-base);}
+.validate-btn.done{background:var(--valid-soft);border-color:var(--valid);color:var(--valid);box-shadow:0 0 calc(var(--halo-mult) * 6px) var(--valid-glow), 0 0 calc(var(--halo-mult) * 13px) var(--valid-soft);}
 
 /* ---------- vue exercices ---------- */
 .exo-toolbar{padding:6px 10px 10px;}
@@ -851,7 +852,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.46</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.47</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -3612,7 +3613,7 @@ function refreshTrendClasses(w, exoId){
 
 function validateGlyph(done){
   return done
-    ? '<svg viewBox="0 0 24 24" width="60%" height="60%"><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    ? '<svg viewBox="0 0 24 24" width="60%" height="60%"><path class="vg-out" d="M5 12.5l4.2 4.2L19 7" fill="none" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
     : '<svg viewBox="0 0 24 24" width="52%" height="52%"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
 }
 function escapeHtml(str){
@@ -4328,9 +4329,8 @@ var colorRandomHistory = [];
    luminosité pour rester visible (contraste >= 3:1) sur le fond du thème, puis on garde les 5
    couleurs qui demandent le moins de retouche, réparties au hasard entre les 5 rôles. */
 var CURATED_PALETTES = [["#000000", "#839788", "#baa898", "#eee0cb", "#bfd7ea"], ["#ffadad", "#ffd6a5", "#fdffb6", "#caffbf", "#9bf6ff"], ["#a0c4ff", "#bdb2ff", "#ffc6ff", "#fffffc", "#ffadad"], ["#cdb4db", "#ffc8dd", "#ffafcc", "#bde0fe", "#a2d2ff"], ["#e0fbfc", "#c2dfe3", "#9db4c0", "#5c6b73", "#253237"], ["#f8edeb", "#fcd5ce", "#fae1dd", "#f9dcc4", "#fec89a"], ["#d8e2dc", "#ffe5d9", "#ffcad4", "#f4acb7", "#9d8189"], ["#606c38", "#283618", "#fefae0", "#dda15e", "#bc6c25"], ["#ccd5ae", "#e9edc9", "#fefae0", "#faedcd", "#d4a373"], ["#264653", "#2a9d8f", "#e9c46a", "#f4a261", "#e76f51"], ["#6d6875", "#b5838d", "#e5989b", "#ffb4a2", "#ffcdb2"], ["#335c67", "#fff3b0", "#e09f3e", "#9e2a2b", "#540b0e"], ["#8ecae6", "#219ebc", "#023047", "#ffb703", "#fb8500"], ["#ff006e", "#fb5607", "#ffbe0b", "#8338ec", "#3a86ff"], ["#f72585", "#b5179e", "#7209b7", "#3a0ca3", "#4cc9f0"], ["#ef476f", "#ffd166", "#06d6a0", "#118ab2", "#073b4c"], ["#ff595e", "#ffca3a", "#8ac926", "#1982c4", "#6a4c93"], ["#00f5d4", "#00bbf9", "#fee440", "#f15bb5", "#9b5de5"], ["#ff9f1c", "#ffbf69", "#ffffff", "#cbf3f0", "#2ec4b6"], ["#03045e", "#0077b6", "#00b4d8", "#90e0ef", "#caf0f8"], ["#0b132b", "#1c2541", "#3a506b", "#5bc0be", "#6fffe9"], ["#05668d", "#028090", "#00a896", "#02c39a", "#f0f3bd"], ["#012a4a", "#2a6f97", "#61a5c2", "#a9d6e5", "#e9f5ff"], ["#1b4332", "#2d6a4f", "#40916c", "#74c69d", "#b7e4c7"], ["#590d22", "#a4133c", "#ff4d6d", "#ff8fa3", "#ffccd5"], ["#370617", "#9d0208", "#dc2f02", "#f48c06", "#ffba08"], ["#fcbf49", "#f77f00", "#d62828", "#003049", "#eae2b7"], ["#dad7cd", "#a3b18a", "#588157", "#3a5a40", "#344e41"], ["#edf2f4", "#8d99ae", "#2b2d42", "#ef233c", "#d90429"], ["#f2e9e4", "#c9ada7", "#9a8c98", "#4a4e69", "#22223b"], ["#ffe8d6", "#ddbea9", "#cb997e", "#b7b7a4", "#a5a58d"], ["#780116", "#c32f27", "#d8572a", "#db7c26", "#f7b538"], ["#7400b8", "#6930c3", "#5e60ce", "#5390d9", "#4ea8de"], ["#99e2b4", "#88d4ab", "#78c6a3", "#67b99a", "#56ab91"], ["#e63946", "#f1faee", "#a8dadc", "#457b9d", "#1d3557"], ["#f94144", "#f3722c", "#f8961e", "#f9c74f", "#90be6d"], ["#e07a5f", "#3d405b", "#81b29a", "#f2cc8f", "#f4f1de"], ["#b8b8ff", "#9381ff", "#ffeedd", "#ffd8be", "#f8f7ff"], ["#001219", "#005f73", "#0a9396", "#94d2bd", "#e9d8a6"], ["#ee9b00", "#ca6702", "#bb3e03", "#ae2012", "#9b2226"], ["#d00000", "#ffba08", "#3f88c5", "#032b43", "#136f63"], ["#1a535c", "#4ecdc4", "#f7fff7", "#ff6b6b", "#ffe66d"], ["#5f0f40", "#9a031e", "#fb8b24", "#e36414", "#0f4c5c"], ["#cdeac0", "#fdffb6", "#ffd6a5", "#ffadad", "#bdb2ff"], ["#ff9770", "#ffd670", "#e9ff70", "#70d6ff", "#ff70a6"], ["#2d00f7", "#8900f2", "#bc00dd", "#e500a4", "#f20089"], ["#c9cba3", "#ffe1a8", "#e26d5c", "#723d46", "#472d30"], ["#5aa9e6", "#7fc8f8", "#ffffff", "#ffe45e", "#ff6392"]];
-var COLOR_HARMONIES = [
-  [0, 30, 60, -30, 15], [0, 180, 15, 195, 90], [0, 120, 240, 20, 140],
-  [0, 150, 210, -20, 30], [0, 90, 180, 270, 45], [0, 60, 180, 240, 120], [0, 0, 0, 0, 0]
+var COLOR_HARMONIES = [   // décalages de teinte voisins : les 4 couleurs de base restent homogènes
+  [0, 20, 40, -20, 10], [0, 30, 60, -30, 15], [0, 12, 24, -12, 6], [0, 0, 0, 0, 0]
 ];
 var COLOR_MOODS = [
   {s:[70,90], l:[48,60]},   // vive
@@ -4362,15 +4362,44 @@ function fitToTheme(hex, theme){
   while(!ok(l) && steps < 40){ l += dark ? 2 : -2; steps++; }
   return { hex: hslToHex(hsl.h, hsl.s, Math.max(4, Math.min(96, l))), steps: steps };
 }
+function hueDist(a, b){ var d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; }
+/* Règle de la roue : 4 couleurs homogènes (palette cohérente) + 1 couleur "tranchante", la couleur de validation.
+   Base : parmi les 5 couleurs d'une palette, on écarte celle qui étale le plus les teintes.
+   Accent : teinte la plus éloignée de toutes celles de la base, très saturée, ajustée au thème. */
+function homogeneousFour(pal, theme){
+  var f = pal.map(function(h){ var fit = fitToTheme(h, theme), hsl = hexToHsl(fit.hex); return {hex:fit.hex, h:hsl.h, s:hsl.s, steps:fit.steps}; });
+  var best = null, bestCost = Infinity;
+  for(var drop = 0; drop < f.length; drop++){
+    var sub = f.filter(function(_, i){ return i !== drop; }), cost = 0;
+    for(var i = 0; i < sub.length; i++){
+      cost += sub[i].steps * 2;
+      for(var j = i + 1; j < sub.length; j++) cost += hueDist(sub[i].h, sub[j].h) * Math.min(sub[i].s, sub[j].s) / 100;
+    }
+    if(cost < bestCost){ bestCost = cost; best = sub; }
+  }
+  return best;
+}
+function accentFor(base, theme){
+  var hues = base.filter(function(c){ return c.s >= 15; }).map(function(c){ return c.h; });
+  var bestH = Math.random() * 360, bestScore = -1;
+  if(hues.length){
+    for(var h = 0; h < 360; h += 5){
+      var sc = Math.min.apply(null, hues.map(function(x){ return hueDist(h, x); })) + Math.random() * 6;
+      if(sc > bestScore){ bestScore = sc; bestH = h; }
+    }
+  }
+  var dark = (theme !== "light");
+  return fitToTheme(hslToHex(bestH, 90 + Math.random() * 10, dark ? 58 : 44), theme).hex;
+}
 function harmonyHexes(){
   var pal = Math.random() < 0.6
     ? CURATED_PALETTES[Math.floor(Math.random() * CURATED_PALETTES.length)]
     : generatedPalette();
   var theme = (state.settings && state.settings.theme) || "dark";
-  var fitted = pal.map(function(h){ return fitToTheme(h, theme); });
-  shuffleInPlace(fitted);
-  fitted.sort(function(a, b){ return a.steps - b.steps; }); // les plus retouchées en dernier
-  return shuffleInPlace(fitted.slice(0, 5).map(function(f){ return f.hex; }));
+  var base = homogeneousFour(pal, theme);
+  var out = shuffleInPlace(base.map(function(c){ return c.hex; }));
+  out.push(accentFor(base, theme)); // 5e rôle (colorValid) = couleur tranchante
+  return out;
 }
 function updateRandomizeUndoBtn(){
   var btn = document.getElementById("colorRandomUndoBtn");
