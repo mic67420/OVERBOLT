@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.48</title>
+<title>OVERBOLT | NO BS v3.49</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -852,7 +852,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.48</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.49</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -3289,9 +3289,17 @@ function formatDate(iso){
 var seriesList = document.getElementById("seriesList");
 function renderSeriesList(){
   var data = currentData();
-  var scrollBefore = 0;
-  var existingScroller = seriesList.querySelector(".exo-series-scroll");
-  if(existingScroller) scrollBefore = existingScroller.scrollLeft;
+  // Position à conserver uniquement pour un exercice que l'utilisateur est en train de faire défiler
+  // (doigt posé ou relâché il y a < 2,5 s) et seulement si on reste sur la même séance ; sinon
+  // TOUTES les fenêtres d'exercice sont poussées au maximum à droite (semaine la plus récente).
+  var keepScroll = {};
+  if(seriesList._renderedDay === state.currentDay){
+    seriesList.querySelectorAll(".exo-series-scroll").forEach(function(el){
+      if(el._touching || el._isPointerDown || (Date.now() - (el._lastTouchAt || 0) < 2500)){
+        keepScroll[el.getAttribute("data-exoid")] = el.scrollLeft;
+      }
+    });
+  }
   var html = "";
   data.exercises.forEach(function(exo, ri){
     var hasPhoto = exo.photo ? "has-photo" : "";
@@ -3376,10 +3384,13 @@ function renderSeriesList(){
   });
   html += '<button class="add-exo-band" data-role="add-exo">＋ Ajouter un exercice</button>';
   seriesList.innerHTML = html;
+  seriesList._renderedDay = state.currentDay;
   initSeriesScrollers();
-  if(scrollBefore > 0){
-    seriesList.querySelectorAll(".exo-series-scroll").forEach(function(el){ el.scrollLeft = scrollBefore; });
-  }
+  seriesList.querySelectorAll(".exo-series-scroll").forEach(function(el){
+    var kept = keepScroll[el.getAttribute("data-exoid")];
+    if(kept !== undefined){ el.scrollLeft = kept; watchMomentumThenSpring(el); }
+    else el.scrollLeft = el.scrollWidth;
+  });
 }
 var focusedWeekKey = null; // null = toujours la semaine la plus récente (comportement par défaut)
 function detectFocusedWeek(el){
@@ -3461,20 +3472,21 @@ function interruptSpringLocal(el){
 
 function startSpringBackLocal(el){
   var start = el.scrollLeft;
-  var target = el.scrollWidth - el.clientWidth;
-  if(target < 0) target = 0;
-  if(Math.abs(start - target) < 1) return;
+  function maxLeft(){ return Math.max(0, el.scrollWidth - el.clientWidth); }
+  if(Math.abs(start - maxLeft()) < 1) return;
   el._isSpringAnimating = true;
   el.style.scrollSnapType = "none"; // évite que le snapping natif ne perturbe l'animation pilotée en JS
   var t0 = performance.now();
-  springLog(el, "ressort démarré ("+Math.round(start)+" -> "+Math.round(target)+")");
+  springLog(el, "ressort démarré ("+Math.round(start)+" -> "+Math.round(maxLeft())+")");
   function step(now){
     if(!el._isSpringAnimating) return; // interrompu entre-temps (retouché)
     var progress = Math.min(1, (now - t0) / SPRING_DURATION_MS);
+    var target = maxLeft(); // recalculée à chaque image : jamais trop court si la mise en page change
     el.scrollLeft = start + (target - start) * easeInOutSine(progress);
     if(progress < 1){
       el._springAnimId = requestAnimationFrame(step);
     } else {
+      el.scrollLeft = maxLeft(); // calage final garanti tout à droite
       el._isSpringAnimating = false;
       el._springAnimId = null;
       el.style.scrollSnapType = "";
@@ -3517,6 +3529,7 @@ function watchMomentumThenSpring(el){
 function initSeriesScroller(el){
   el.addEventListener("pointerdown", function(e){
     el._isPointerDown = true;
+    el._lastTouchAt = Date.now();
     el._activePointerId = e.pointerId;
     interruptSpringLocal(el);
     springLog(el, "doigt posé");
@@ -3526,6 +3539,7 @@ function initSeriesScroller(el){
     if(!el._isPointerDown) return;
     if(el._activePointerId !== undefined && e.pointerId !== el._activePointerId) return;
     el._isPointerDown = false;
+    el._lastTouchAt = Date.now();
     el._activePointerId = undefined;
     springLog(el, "doigt relâché");
     watchMomentumThenSpring(el);
@@ -3535,16 +3549,19 @@ function initSeriesScroller(el){
 
   el.addEventListener("touchstart", function(){
     el._touching = true;
+    el._lastTouchAt = Date.now();
     interruptSpringLocal(el);
   }, {passive:true});
   function onTouchEnd(){
     el._touching = false;
+    el._lastTouchAt = Date.now();
     if(!el._momentumWatchActive && !el._springTimer && !el._isSpringAnimating) watchMomentumThenSpring(el);
   }
   el.addEventListener("touchend", onTouchEnd, {passive:true});
   el.addEventListener("touchcancel", onTouchEnd, {passive:true});
 
   el.addEventListener("scroll", function(){
+    if(!el._isSpringAnimating) el._lastTouchAt = Date.now(); // défilement par l'utilisateur (ou son inertie)
     if(el._momentumWatchActive) scheduleMomentumCheck(el);
     clearTimeout(el._focusDetectTimer);
     el._focusDetectTimer = setTimeout(function(){ detectFocusedWeek(el); }, 120);
@@ -3553,6 +3570,20 @@ function initSeriesScroller(el){
 function initSeriesScrollers(){
   seriesList.querySelectorAll(".exo-series-scroll").forEach(initSeriesScroller);
 }
+/* Chien de garde ("forçage") : quoi qu'il arrive (événement tactile perdu, ressort interrompu par un
+   réaffichage, changement de séance, mise en page tardive...), toute fenêtre d'exercice laissée au repos
+   ailleurs qu'au maximum à droite y est ramenée. Ne touche jamais une fenêtre en cours de manipulation. */
+setInterval(function(){
+  var now = Date.now();
+  seriesList.querySelectorAll(".exo-series-scroll").forEach(function(el){
+    if(!el.clientWidth) return; // onglet masqué
+    var idleFor = now - (el._lastTouchAt || 0);
+    var flagged = el._touching || el._isPointerDown || el._momentumWatchActive || el._springTimer || el._isSpringAnimating;
+    if(flagged && idleFor > 6000){ el._touching = false; el._isPointerDown = false; interruptSpringLocal(el); flagged = false; } // état resté coincé
+    if(flagged || idleFor < SPRING_RELEASE_DELAY_MS + 600) return;
+    if(el.scrollWidth - el.clientWidth - el.scrollLeft > 2) startSpringBackLocal(el);
+  });
+}, 800);
 function serieLabelText(n){
   var lang = (state && state.settings && state.settings.language) || "en";
   if(lang === "zh") return t("serie_label")+n+"组";
