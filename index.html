@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.49</title>
+<title>OVERBOLT | NO BS v3.50</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -852,7 +852,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.49</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.50</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -3849,8 +3849,25 @@ document.addEventListener("input", function(e){
     var rowEntry = getWeekRow(data.weeks[w], exoId);
     if(!rowEntry){ return; }
     var row = rowEntry.series;
+    var prevChargeNum = (role === "charge") ? parseFloat(String(row[s].charge).replace(",", ".")) : NaN;
     row[s][role] = t.value;
     row[s][role+"Auto"] = false;
+    if(role === "charge" && s >= 1){
+      // Charge augmentée en cours d'exercice : les séries suivantes non validées qui sont plus basses
+      // se mettent au même niveau (ex. 28 kg en série 3 -> la série 4 passe aussi à 28 kg).
+      var newChargeNum = parseFloat(String(t.value).replace(",", "."));
+      if(!isNaN(newChargeNum) && (isNaN(prevChargeNum) || newChargeNum > prevChargeNum)){
+        for(var kc = s + 1; kc < row.length; kc++){
+          if(row[kc].validated) continue;
+          var kcNum = parseFloat(String(row[kc].charge).replace(",", "."));
+          if(isNaN(kcNum) || kcNum < newChargeNum){
+            row[kc].charge = t.value;
+            var elc = document.querySelector('input[data-role="charge"][data-week="'+w+'"][data-exoid="'+exoId+'"][data-serie="'+kc+'"]');
+            if(elc) elc.value = t.value;
+          }
+        }
+      }
+    }
     if(s === 0){
       // Les répétitions de la série 1 définissent TOUJOURS celles des séries suivantes
       // (synchronisation systématique, sans exception). La charge reste libre par série
@@ -4683,7 +4700,7 @@ function addExerciseToCurrentDay(exoData, seedSeries, sourceDayForHistory, sourc
 // verrouillées, cherche "newName" dans tout l'historique (actif + archivé,
 // toutes séances) pour reprendre son meilleur poids/reps sur la semaine en
 // cours, sinon la semaine en cours repart à zéro.
-function applyExerciseReplace(exoR, newName){
+function applyExerciseReplace(exoR, newName, pickedSource){
   newName = (newName || "").trim();
   if(!newName || newName === exoR.name) return;
   var data = currentData();
@@ -4695,40 +4712,67 @@ function applyExerciseReplace(exoR, newName){
     if(rowEntry && !rowEntry.nameAtTime) rowEntry.nameAtTime = oldName;
   });
 
+  // Même exercice (même nom) dans toutes les séances, actifs ou archivés : on retient pour chacun ses
+  // données les plus récentes (dernière semaine où une charge est renseignée).
   var newNameLower = newName.toLowerCase();
-  var bestCharge = null, bestReps = null;
+  var matches = [];
   state.dayOrder.forEach(function(d){
     var day2 = state.days[d];
     if(!day2 || !day2.weeks) return;
-    var pool = (day2.exercises || []).concat(day2.archivedExercises || []);
-    pool.forEach(function(otherExo){
-      if((otherExo.name || "").trim().toLowerCase() !== newNameLower) return;
-      day2.weeks.forEach(function(week2){
-        var r = getWeekRow(week2, otherExo.id);
-        if(!r || !r.series) return;
-        r.series.forEach(function(s){
-          var c = parseFloat(s.charge);
-          if(isNaN(c)) return;
-          if(bestCharge === null || c > bestCharge){ bestCharge = c; bestReps = s.reps; }
-        });
-      });
+    (day2.exercises || []).concat(day2.archivedExercises || []).forEach(function(otherExo){
+      if(otherExo === exoR || (otherExo.name || "").trim().toLowerCase() !== newNameLower) return;
+      var found = null, fallback = null;
+      for(var i = day2.weeks.length - 1; i >= 0 && !found; i--){
+        var r = getWeekRow(day2.weeks[i], otherExo.id);
+        if(!r || !r.series || !r.series.length) continue;
+        if(!fallback) fallback = {series:r.series, startDate:day2.weeks[i].startDate};
+        if(r.series.some(function(x){ return !isNaN(parseFloat(x.charge)); })) found = {series:r.series, startDate:day2.weeks[i].startDate};
+      }
+      found = found || fallback;
+      if(found) matches.push({exo:otherExo, series:found.series, startDate:found.startDate || ""});
+    });
+  });
+  var primary = null;
+  if(pickedSource) primary = matches.filter(function(m){ return m.exo === pickedSource; })[0] || null;
+  if(!primary && matches.length){
+    primary = matches.slice().sort(function(a, b){ return a.startDate < b.startDate ? 1 : (a.startDate > b.startDate ? -1 : 0); })[0];
+  }
+  var bestCharge = null, bestReps = null;
+  matches.forEach(function(m){
+    m.series.forEach(function(x){
+      var c = parseFloat(x.charge);
+      if(isNaN(c)) return;
+      if(bestCharge === null || c > bestCharge){ bestCharge = c; bestReps = x.reps; }
     });
   });
 
   var currentWeek = data.weeks[data.weeks.length - 1];
   var currentRow = getWeekRow(currentWeek, exoR.id);
   if(currentRow && currentRow.series){
-    currentRow.series.forEach(function(s){
-      if(bestCharge !== null){
-        s.charge = String(bestCharge);
-        s.reps = bestReps;
-      } else {
+    if(primary){
+      // Reprise de la structure réelle : nombre de séries, charge, reps et repos de chaque série ; les séries
+      // plus légères que la meilleure charge connue sont relevées à celle-ci (même règle que la semaine suivante).
+      currentRow.series = primary.series.map(function(x){
+        var c = parseFloat(x.charge);
+        var lift = (bestCharge !== null && (isNaN(c) || bestCharge > c));
+        return {
+          charge: lift ? String(bestCharge) : x.charge,
+          reps: lift ? bestReps : x.reps,
+          rest: x.rest,
+          validated:false, chargeAuto:true, repsAuto:true, restAuto:true
+        };
+      });
+      var src = primary.exo;
+      ["photo","detail1","detail2"].forEach(function(k){ if(src[k]) exoR[k] = src[k]; });
+      if(src.restBetweenExercises !== undefined) exoR.restBetweenExercises = src.restBetweenExercises;
+    } else {
+      currentRow.series.forEach(function(s){
         s.charge = "";
         s.reps = "";
-      }
-      s.validated = false;
-      s.chargeAuto = true; s.repsAuto = true;
-    });
+        s.validated = false;
+        s.chargeAuto = true; s.repsAuto = true;
+      });
+    }
   }
 
   exoR.name = newName;
@@ -4785,7 +4829,7 @@ document.getElementById("epmList").addEventListener("click", function(e){
     if(!sourceR || pickerTargetExoIndex === null) return;
     var targetExo = currentData().exercises[pickerTargetExoIndex];
     if(!targetExo) return;
-    applyExerciseReplace(targetExo, sourceR.name);
+    applyExerciseReplace(targetExo, sourceR.name, sourceR);
     exoPickerModal.classList.remove("open");
     return;
   }
