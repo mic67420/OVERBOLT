@@ -14,7 +14,7 @@ CE QU'IL Y A DEDANS (spoiler : pas grand-chose, et c'est voulu)
 ✔ Android et iPhone, 16 langues
 
 COMMENT ÇA MARCHE
-1. Tu achètes (5 €).
+1. Tu achètes une fois (5 €, sans abonnement).
 2. Tu reçois un code d'accès par e-mail.
 3. Tu ouvres l'application, tu saisis le code une fois, c'est débloqué.
 4. Tu l'ajoutes à ton écran d'accueil. Pas de boutique d'applications.
