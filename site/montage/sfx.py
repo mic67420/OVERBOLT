@@ -1,11 +1,11 @@
 import math, random, struct, wave
-random.seed(3); SR=44100; DUR=4.8; N=int(SR*DUR); mix=[0.0]*N
+random.seed(3); SR=44100; DUR=5.0; N=int(SR*DUR); mix=[0.0]*N
 def add(t0,s,g=1.0):
     i0=int(t0*SR)
     for k,v in enumerate(s):
         j=i0+k
         if 0<=j<N: mix[j]+=v*g
-T_ALARM,T_BOOM,T_LOGO=1.4,2.8,3.6
+T_ALARM,T_BOOM,T_LOGO=1.6,3.0,3.8
 # ronronnement du réacteur + bips
 for i in range(int(T_BOOM*SR)):
     t=i/SR; amp=0.10+0.10*min(1,t/T_BOOM)
@@ -39,7 +39,9 @@ def crash():
     return out
 def pop():
     return [math.sin(2*math.pi*(900-3500*(k/SR))*k/SR)*math.exp(-k/SR*45)*0.7 for k in range(int(0.08*SR))]
-add(T_BOOM,boom(),1.0);add(T_BOOM,crash(),0.7);add(T_BOOM,pop(),0.8)
+add(T_BOOM,boom(),1.0);add(T_BOOM,crash(),0.6)
+for tp,fq in [(0.35,880),(0.7,740),(1.0,990),(1.28,660),(1.5,1100)]:
+    add(tp,[ (math.sin(2*math.pi*fq*k/SR)+0.4*math.sin(2*math.pi*fq*2*k/SR))*math.exp(-k/SR*14)*0.32 for k in range(int(0.22*SR))])
 # whoosh + ding du logo
 def whoosh():
     L=int(0.22*SR);out=[];lp=0.0
