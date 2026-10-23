@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.51</title>
+<title>OVERBOLT | NO BS v3.52</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -852,7 +852,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.51</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.52</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -5025,7 +5025,8 @@ var ft = document.getElementById("floatTimer");
 var ftTime = document.getElementById("ftTime");
 var ftLabel = document.getElementById("ftLabel");
 var ftPauseBtn = document.getElementById("ftPause");
-var timerHandle = null, timerRemaining = 0, timerTotal = 0, timerPaused = false;
+var timerHandle = null, timerRemaining = 0, timerTotal = 0, timerPaused = false, timerEndAt = 0, timerFinished = false, timerLabel = "";
+var REST_KEY = "overbolt_rest_v1"; // chrono de repos sauvegardé (survit au rechargement et à la mise en veille)
 var sessionTickHandle = null, sessionWeekRef = null;
 
 function toggleSeanceFinished(dayName){
@@ -5082,9 +5083,7 @@ function toggleSeanceFinished(dayName){
   }
 }
 function widgetSessionActive(){
-  var data = currentData();
-  var week = data.weeks[data.weeks.length - 1];
-  return !!(week.session && week.session.startAt);
+  return !!findSessionToShow();
 }
 /* Cohérence entre séances ET entre semaines : impossible de démarrer une nouvelle séance tant
    qu'une autre est restée en cours ailleurs (autre séance, ou semaine passée jamais résolue).
@@ -5167,7 +5166,7 @@ function updateSessionTime(){
 }
 function resetSessionTimer(){
   var data = currentData();
-  var week = data.weeks[data.weeks.length - 1];
+  var week = (sessionWeekRef && sessionWeekRef.session) ? sessionWeekRef : data.weeks[data.weeks.length - 1];
   if(!week.session || !week.session.startAt) return; // rien à réinitialiser
   if(!confirm(t("confirm_reset_session"))) return;
   week.session = {startAt:null, endAt:null, lastActivityAt:null};
@@ -5184,46 +5183,106 @@ document.getElementById("ftSessionReset").addEventListener("click", function(e){
   e.stopPropagation();
   resetSessionTimer();
 });
+/* Séance dont le chrono doit s'afficher : celle de la séance affichée (même terminée), sinon une séance
+   EN COURS dans une autre séance — le chrono ne disparaît donc plus quand on va regarder une autre séance. */
+function findSessionToShow(){
+  var order = [state.currentDay].concat(state.dayOrder.filter(function(d){ return d !== state.currentDay; }));
+  for(var i = 0; i < order.length; i++){
+    var dd = state.days[order[i]];
+    if(!dd || !dd.weeks || !dd.weeks.length) continue;
+    var w = dd.weeks[dd.weeks.length - 1];
+    if(w.session && w.session.startAt && (i === 0 || !w.session.endAt)) return {week:w, day:order[i]};
+  }
+  return null;
+}
 function refreshSessionWidgetForCurrentDay(){
   stopSessionTicker();
   sessionWeekRef = null;
-  var data = currentData();
-  var week = data.weeks[data.weeks.length - 1];
-  if(week.session && week.session.startAt){
-    startSessionTicker(week);
+  var found = findSessionToShow();
+  var lab = ft.querySelector(".ft-session .fc-label");
+  if(found){
+    if(lab) lab.textContent = (found.day !== state.currentDay) ? found.day : t("session_label");
+    startSessionTicker(found.week);
     ft.classList.add("show");
-  } else if(!ft.classList.contains("resting")){
-    ft.classList.remove("show");
+  } else {
+    if(lab) lab.textContent = t("session_label");
+    if(!ft.classList.contains("resting")) ft.classList.remove("show");
   }
 }
 
+/* Chrono de repos : basé sur une HEURE DE FIN (Date.now) et non sur un décompte seconde par seconde.
+   Même si le téléphone met l'app en veille, change d'application ou ralentit les minuteurs, le temps restant
+   est toujours recalculé exactement ; l'état est sauvegardé pour survivre à un rechargement de la page. */
+function saveRest(){
+  try{
+    if(!timerTotal){ localStorage.removeItem(REST_KEY); return; }
+    localStorage.setItem(REST_KEY, JSON.stringify({endAt:timerEndAt, total:timerTotal, label:timerLabel, paused:timerPaused, remaining:timerRemaining, finished:timerFinished}));
+  }catch(e){}
+}
+function clearRest(){ try{ localStorage.removeItem(REST_KEY); }catch(e){} }
 function startFloatTimer(seconds, label){
   seconds = Math.max(0, parseInt(seconds,10) || 0);
-  timerRemaining = seconds; timerTotal = seconds; timerPaused = false;
+  timerTotal = seconds; timerRemaining = seconds; timerPaused = false; timerFinished = false;
+  timerLabel = label || t("rest_label");
+  timerEndAt = Date.now() + seconds * 1000;
   if(audioCtx && audioCtx.state === "suspended") audioCtx.resume().catch(function(){});
-  ftLabel.textContent = label || t("rest_label");
+  ftLabel.textContent = timerLabel;
   ft.classList.add("show"); ft.classList.add("resting"); ft.classList.remove("ending");
   ftPauseBtn.textContent = "⏸";
   updateFtDisplay();
   clearInterval(timerHandle);
   timerHandle = setInterval(tickTimer, 1000);
+  saveRest();
 }
-function tickTimer(){
-  if(timerPaused) return;
-  timerRemaining--;
-  if(timerRemaining <= 5 && timerRemaining >= 0) ft.classList.add("ending");
-  if(timerRemaining <= 0){
-    clearInterval(timerHandle);
-    timerRemaining = 0;
-    updateFtDisplay();
+function finishRest(overdueMs){
+  clearInterval(timerHandle); timerHandle = null;
+  timerRemaining = 0; timerFinished = true;
+  ft.classList.add("show"); ft.classList.add("resting"); ft.classList.add("ending");
+  updateFtDisplay();
+  ftLabel.textContent = t("rest_done_label");
+  if(overdueMs < 15000){ // alerte seulement si la fin vient d'arriver (pas pour un repos terminé il y a longtemps)
     buzz([400,150,400,150,400,150,700]);
     alarmSound();
-    ftLabel.textContent = t("rest_done_label");
     triggerScreenFlash();
-    return;
   }
+  saveRest();
+}
+function tickTimer(){
+  if(timerPaused || timerFinished || !timerEndAt) return;
+  var rem = Math.max(0, Math.ceil((timerEndAt - Date.now()) / 1000));
+  timerRemaining = rem;
+  if(rem <= 5) ft.classList.add("ending");
+  if(rem <= 0){ finishRest(Date.now() - timerEndAt); return; }
   updateFtDisplay();
 }
+function restoreRest(){
+  var raw = null;
+  try{ raw = localStorage.getItem(REST_KEY); }catch(e){ return; }
+  if(!raw) return;
+  var r = null;
+  try{ r = JSON.parse(raw); }catch(e){ clearRest(); return; }
+  if(!r || !r.total){ clearRest(); return; }
+  if(!r.paused && Date.now() - (r.endAt || 0) > 30*60*1000){ clearRest(); return; } // trop ancien
+  timerTotal = r.total; timerLabel = r.label || t("rest_label"); timerPaused = !!r.paused;
+  timerEndAt = r.endAt || 0; timerRemaining = r.remaining || 0; timerFinished = !!r.finished;
+  ft.classList.add("show"); ft.classList.add("resting");
+  ftLabel.textContent = timerLabel; ftPauseBtn.textContent = timerPaused ? "▶" : "⏸";
+  if(timerFinished){ timerRemaining = 0; ft.classList.add("ending"); ftLabel.textContent = t("rest_done_label"); updateFtDisplay(); return; }
+  if(timerPaused){ updateFtDisplay(); return; }
+  clearInterval(timerHandle); timerHandle = setInterval(tickTimer, 1000);
+  tickTimer();
+}
+// Au retour dans l'app (veille, autre application, autre onglet) : tout est recalculé immédiatement.
+function syncTimersNow(){
+  if(!timerPaused && !timerFinished && timerEndAt){
+    if(!timerHandle) timerHandle = setInterval(tickTimer, 1000);
+    tickTimer();
+  }
+  refreshSessionWidgetForCurrentDay();
+}
+document.addEventListener("visibilitychange", function(){ if(document.visibilityState === "visible") syncTimersNow(); });
+window.addEventListener("pageshow", syncTimersNow);
+window.addEventListener("focus", syncTimersNow);
 function updateFtDisplay(){
   var m = Math.floor(timerRemaining/60), s = timerRemaining%60;
   ftTime.textContent = (m<10?"0":"")+m+":"+(s<10?"0":"")+s;
@@ -5237,19 +5296,29 @@ function triggerScreenFlash(){
 }
 ftPauseBtn.addEventListener("click", function(e){
   e.stopPropagation();
-  timerPaused = !timerPaused;
+  if(timerFinished) return;
+  if(!timerPaused){ timerRemaining = Math.max(0, Math.ceil((timerEndAt - Date.now()) / 1000)); timerPaused = true; }
+  else { timerPaused = false; timerEndAt = Date.now() + timerRemaining * 1000; }
   ftPauseBtn.textContent = timerPaused ? "▶" : "⏸";
+  saveRest();
 });
 document.getElementById("ftReset").addEventListener("click", function(e){
   e.stopPropagation();
-  timerRemaining = timerTotal;
+  timerRemaining = timerTotal; timerFinished = false;
+  timerEndAt = Date.now() + timerTotal * 1000;
   ft.classList.remove("ending");
+  if(timerLabel) ftLabel.textContent = timerLabel;
   updateFtDisplay();
+  if(!timerPaused && !timerHandle) timerHandle = setInterval(tickTimer, 1000);
+  saveRest();
 });
 document.getElementById("ftClose").addEventListener("click", function(e){
   e.stopPropagation();
-  clearInterval(timerHandle);
+  clearInterval(timerHandle); timerHandle = null;
+  timerTotal = 0; timerEndAt = 0; timerFinished = false; timerPaused = false;
+  clearRest();
   ft.classList.remove("resting");
+  ft.classList.remove("ending");
   if(!widgetSessionActive()) ft.classList.remove("show");
 });
 
@@ -5406,6 +5475,7 @@ renderColorTiles();
 checkAutoWeeksAll();
 switchView("series");
 renderAll();
+restoreRest();
 refreshSessionWidgetForCurrentDay();
 
 // Au démarrage de l'app, chaque exercice est cadré sur la semaine en cours
