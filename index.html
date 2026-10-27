@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.53</title>
+<title>OVERBOLT | NO BS v3.54</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -553,6 +553,13 @@ html[data-theme="dark"] :is(.day-pill,.day-add,.day-remove,.view-tab,.banner,.ex
 }
 .epm-item:active{border-color:var(--neon);box-shadow:0 0 6px var(--neon-soft);}
 .epm-item.epm-archived{opacity:.6;font-style:italic;}
+.arch-band{margin-top:4px;opacity:.85;}
+.arch-item{display:flex;flex-direction:column;gap:6px;}
+.arch-panel{border:1px solid var(--ink-base);border-radius:10px;padding:10px;background:var(--bg-0);color:var(--ink-base);font-size:.78rem;}
+.arch-pics{display:flex;gap:6px;margin-bottom:8px;}
+.arch-pics img{height:64px;border-radius:8px;border:1px solid var(--ink-base);}
+.arch-week{margin:5px 0;line-height:1.35;}
+.arch-week span{opacity:.7;}
 .epm-archived-tag{
   margin-left:auto;font-style:normal;font-size:.58rem;letter-spacing:.04em;
   color:var(--text-dim2);border:1px solid var(--border);border-radius:6px;padding:2px 6px;
@@ -855,7 +862,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.53</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.54</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -1646,7 +1653,7 @@ var TRANSLATIONS = {
     reset_all:"Formater l'ensemble des données et les exercices",
     color_modal_title:"Choisir une couleur", color_validate_btn:"Valider",
     exo_picker_title:"Ajouter un exercice", exo_picker_new:"＋ Nouvel exercice vierge", exo_picker_or:"— ou reprendre un exercice existant —",
-    exo_picker_empty:"Aucun exercice existant pour le moment.", exo_archived_tag:"archivé",
+    exo_picker_empty:"Aucun exercice existant pour le moment.", exo_archived_tag:"archivé", archived_exos_btn:"🗄️ Exercices archivés ({0})", arch_title:"Exercices archivés", arch_none:"Aucun exercice archivé.", arch_no_data:"Aucune donnée enregistrée.", arch_restore:"↩ Restaurer dans cette séance",
     photo_source_title:"Ajouter une photo", photo_source_camera:"📸 Prendre une photo", photo_source_gallery:"🖼️ Choisir depuis la galerie",
     photo_main:"Vue générale", photo_detail1:"Détail 1", photo_detail2:"Détail 2",
     bilan_this_month:"Ce mois-ci", bilan_sessions:"SÉANCES", bilan_total_time:"TEMPS TOTAL", bilan_total_weight:"KG SOULEVÉS (KG×REPS)",
@@ -1719,7 +1726,7 @@ var TRANSLATIONS = {
     reset_all:"Reset everything, including saved exercises",
     color_modal_title:"Choose a color", color_validate_btn:"Confirm",
     exo_picker_title:"Add an exercise", exo_picker_new:"＋ New blank exercise", exo_picker_or:"— or reuse an existing exercise —",
-    exo_picker_empty:"No existing exercise yet.", exo_archived_tag:"archived",
+    exo_picker_empty:"No existing exercise yet.", exo_archived_tag:"archived", archived_exos_btn:"🗄️ Archived exercises ({0})", arch_title:"Archived exercises", arch_none:"No archived exercise.", arch_no_data:"No data recorded.", arch_restore:"↩ Restore to this workout",
     photo_source_title:"Add a photo", photo_source_camera:"📸 Take a photo", photo_source_gallery:"🖼️ Choose from gallery",
     photo_main:"Overview", photo_detail1:"Detail 1", photo_detail2:"Detail 2",
     bilan_this_month:"This month", bilan_sessions:"WORKOUTS", bilan_total_time:"TOTAL TIME", bilan_total_weight:"KG LIFTED (KG×REPS)",
@@ -1789,7 +1796,7 @@ var TRANSLATIONS = {
     reset_all:"Restablecer todo, incluidos los ejercicios guardados",
     color_modal_title:"Elegir un color", color_validate_btn:"Confirmar",
     exo_picker_title:"Añadir un ejercicio", exo_picker_new:"＋ Nuevo ejercicio en blanco", exo_picker_or:"— o reutilizar un ejercicio existente —",
-    exo_picker_empty:"Aún no hay ningún ejercicio.", exo_archived_tag:"archivado",
+    exo_picker_empty:"Aún no hay ningún ejercicio.", exo_archived_tag:"archivado", archived_exos_btn:"🗄️ Ejercicios archivados ({0})", arch_title:"Ejercicios archivados", arch_none:"Ningún ejercicio archivado.", arch_no_data:"Sin datos registrados.", arch_restore:"↩ Restaurar en esta sesión",
     photo_source_title:"Añadir una foto", photo_source_camera:"📸 Hacer una foto", photo_source_gallery:"🖼️ Elegir de la galería",
     photo_main:"Vista general", photo_detail1:"Detalle 1", photo_detail2:"Detalle 2",
     bilan_this_month:"Este mes", bilan_sessions:"ENTRENOS", bilan_total_time:"TIEMPO TOTAL", bilan_total_weight:"KG LEVANTADOS (KG×REPS)",
@@ -1857,7 +1864,7 @@ var TRANSLATIONS = {
     reset_all:"Alles zurücksetzen, inklusive gespeicherter Übungen",
     color_modal_title:"Farbe wählen", color_validate_btn:"Bestätigen",
     exo_picker_title:"Übung hinzufügen", exo_picker_new:"＋ Neue leere Übung", exo_picker_or:"— oder eine vorhandene Übung übernehmen —",
-    exo_picker_empty:"Noch keine vorhandene Übung.", exo_archived_tag:"archiviert",
+    exo_picker_empty:"Noch keine vorhandene Übung.", exo_archived_tag:"archiviert", archived_exos_btn:"🗄️ Archivierte Übungen ({0})", arch_title:"Archivierte Übungen", arch_none:"Keine archivierte Übung.", arch_no_data:"Keine Daten gespeichert.", arch_restore:"↩ In dieser Einheit wiederherstellen",
     photo_source_title:"Foto hinzufügen", photo_source_camera:"📸 Foto aufnehmen", photo_source_gallery:"🖼️ Aus Galerie wählen",
     photo_main:"Gesamtansicht", photo_detail1:"Detail 1", photo_detail2:"Detail 2",
     bilan_this_month:"Diesen Monat", bilan_sessions:"EINHEITEN", bilan_total_time:"GESAMTZEIT", bilan_total_weight:"KG GEHOBEN (KG×WDH.)",
@@ -1925,7 +1932,7 @@ var TRANSLATIONS = {
     reset_all:"Ripristina tutto, esercizi salvati inclusi",
     color_modal_title:"Scegli un colore", color_validate_btn:"Conferma",
     exo_picker_title:"Aggiungi un esercizio", exo_picker_new:"＋ Nuovo esercizio vuoto", exo_picker_or:"— oppure riprendi un esercizio esistente —",
-    exo_picker_empty:"Nessun esercizio esistente per ora.", exo_archived_tag:"archiviato",
+    exo_picker_empty:"Nessun esercizio esistente per ora.", exo_archived_tag:"archiviato", archived_exos_btn:"🗄️ Esercizi archiviati ({0})", arch_title:"Esercizi archiviati", arch_none:"Nessun esercizio archiviato.", arch_no_data:"Nessun dato registrato.", arch_restore:"↩ Ripristina in questo allenamento",
     photo_source_title:"Aggiungi una foto", photo_source_camera:"📸 Scatta una foto", photo_source_gallery:"🖼️ Scegli dalla galleria",
     photo_main:"Vista generale", photo_detail1:"Dettaglio 1", photo_detail2:"Dettaglio 2",
     bilan_this_month:"Questo mese", bilan_sessions:"ALLENAMENTI", bilan_total_time:"TEMPO TOTALE", bilan_total_weight:"KG SOLLEVATI (KG×RIP)",
@@ -1993,7 +2000,7 @@ var TRANSLATIONS = {
     reset_all:"Сбросить всё, включая сохранённые упражнения",
     color_modal_title:"Выбрать цвет", color_validate_btn:"Подтвердить",
     exo_picker_title:"Добавить упражнение", exo_picker_new:"＋ Новое пустое упражнение", exo_picker_or:"— или использовать существующее упражнение —",
-    exo_picker_empty:"Пока нет ни одного упражнения.", exo_archived_tag:"архив",
+    exo_picker_empty:"Пока нет ни одного упражнения.", exo_archived_tag:"архив", archived_exos_btn:"🗄️ Архив упражнений ({0})", arch_title:"Архив упражнений", arch_none:"Нет архивных упражнений.", arch_no_data:"Нет сохранённых данных.", arch_restore:"↩ Вернуть в эту тренировку",
     photo_source_title:"Добавить фото", photo_source_camera:"📸 Сделать фото", photo_source_gallery:"🖼️ Выбрать из галереи",
     photo_main:"Общий вид", photo_detail1:"Деталь 1", photo_detail2:"Деталь 2",
     bilan_this_month:"В этом месяце", bilan_sessions:"ТРЕНИРОВКИ", bilan_total_time:"ОБЩЕЕ ВРЕМЯ", bilan_total_weight:"ПОДНЯТО КГ (КГ×ПОВТ.)",
@@ -2061,7 +2068,7 @@ var TRANSLATIONS = {
     reset_all:"重置全部内容，包括已保存的动作",
     color_modal_title:"选择颜色", color_validate_btn:"确认",
     exo_picker_title:"添加动作", exo_picker_new:"＋ 新建空白动作", exo_picker_or:"— 或选择已有的动作 —",
-    exo_picker_empty:"目前还没有已创建的动作。", exo_archived_tag:"已归档",
+    exo_picker_empty:"目前还没有已创建的动作。", exo_archived_tag:"已归档", archived_exos_btn:"🗄️ 已归档的动作（{0}）", arch_title:"已归档的动作", arch_none:"没有已归档的动作。", arch_no_data:"没有已记录的数据。", arch_restore:"↩ 恢复到本次训练",
     photo_source_title:"添加照片", photo_source_camera:"📸 拍照", photo_source_gallery:"🖼️ 从相册选择",
     photo_main:"整体视图", photo_detail1:"细节1", photo_detail2:"细节2",
     bilan_this_month:"本月", bilan_sessions:"训练次数", bilan_total_time:"总时长", bilan_total_weight:"总举重量（KG×次数）",
@@ -2129,7 +2136,7 @@ var TRANSLATIONS = {
     reset_all:"Redefinir tudo, incluindo exercícios salvos",
     color_modal_title:"Escolher uma cor", color_validate_btn:"Confirmar",
     exo_picker_title:"Adicionar um exercício", exo_picker_new:"＋ Novo exercício em branco", exo_picker_or:"— ou reutilizar um exercício existente —",
-    exo_picker_empty:"Ainda não há nenhum exercício.", exo_archived_tag:"arquivado",
+    exo_picker_empty:"Ainda não há nenhum exercício.", exo_archived_tag:"arquivado", archived_exos_btn:"🗄️ Exercícios arquivados ({0})", arch_title:"Exercícios arquivados", arch_none:"Nenhum exercício arquivado.", arch_no_data:"Nenhum dado registrado.", arch_restore:"↩ Restaurar neste treino",
     photo_source_title:"Adicionar uma foto", photo_source_camera:"📸 Tirar uma foto", photo_source_gallery:"🖼️ Escolher da galeria",
     photo_main:"Vista geral", photo_detail1:"Detalhe 1", photo_detail2:"Detalhe 2",
     bilan_this_month:"Este mês", bilan_sessions:"TREINOS", bilan_total_time:"TEMPO TOTAL", bilan_total_weight:"KG LEVANTADOS (KG×REPS)",
@@ -2197,7 +2204,7 @@ var TRANSLATIONS = {
     reset_all:"保存済みの種目を含め、すべてリセット",
     color_modal_title:"色を選択", color_validate_btn:"確定",
     exo_picker_title:"種目を追加", exo_picker_new:"＋ 新しい空の種目", exo_picker_or:"— または既存の種目を再利用 —",
-    exo_picker_empty:"まだ種目がありません。", exo_archived_tag:"アーカイブ済み",
+    exo_picker_empty:"まだ種目がありません。", exo_archived_tag:"アーカイブ済み", archived_exos_btn:"🗄️ アーカイブ済み種目（{0}）", arch_title:"アーカイブ済み種目", arch_none:"アーカイブ済みの種目はありません。", arch_no_data:"記録されたデータはありません。", arch_restore:"↩ このトレーニングに戻す",
     photo_source_title:"写真を追加", photo_source_camera:"📸 写真を撮る", photo_source_gallery:"🖼️ ギャラリーから選択",
     photo_main:"全体写真", photo_detail1:"詳細1", photo_detail2:"詳細2",
     bilan_this_month:"今月", bilan_sessions:"トレーニング回数", bilan_total_time:"合計時間", bilan_total_weight:"総挙上量（KG×回数）",
@@ -2265,7 +2272,7 @@ var TRANSLATIONS = {
     reset_all:"저장된 운동을 포함해 전체 초기화",
     color_modal_title:"색상 선택", color_validate_btn:"확인",
     exo_picker_title:"운동 추가", exo_picker_new:"＋ 새 빈 운동", exo_picker_or:"— 또는 기존 운동 재사용 —",
-    exo_picker_empty:"아직 등록된 운동이 없습니다.", exo_archived_tag:"보관됨",
+    exo_picker_empty:"아직 등록된 운동이 없습니다.", exo_archived_tag:"보관됨", archived_exos_btn:"🗄️ 보관된 운동 ({0})", arch_title:"보관된 운동", arch_none:"보관된 운동이 없습니다.", arch_no_data:"기록된 데이터가 없습니다.", arch_restore:"↩ 이 운동으로 복원",
     photo_source_title:"사진 추가", photo_source_camera:"📸 사진 촬영", photo_source_gallery:"🖼️ 갤러리에서 선택",
     photo_main:"전체 보기", photo_detail1:"세부사항 1", photo_detail2:"세부사항 2",
     bilan_this_month:"이번 달", bilan_sessions:"운동 횟수", bilan_total_time:"총 시간", bilan_total_weight:"총 중량(KG×횟수)",
@@ -2333,7 +2340,7 @@ var TRANSLATIONS = {
     reset_all:"Kayıtlı hareketler dahil her şeyi sıfırla",
     color_modal_title:"Bir renk seç", color_validate_btn:"Onayla",
     exo_picker_title:"Hareket ekle", exo_picker_new:"＋ Yeni boş hareket", exo_picker_or:"— veya mevcut bir hareketi tekrar kullan —",
-    exo_picker_empty:"Henüz kayıtlı bir hareket yok.", exo_archived_tag:"arşivlendi",
+    exo_picker_empty:"Henüz kayıtlı bir hareket yok.", exo_archived_tag:"arşivlendi", archived_exos_btn:"🗄️ Arşivlenen egzersizler ({0})", arch_title:"Arşivlenen egzersizler", arch_none:"Arşivlenmiş egzersiz yok.", arch_no_data:"Kayıtlı veri yok.", arch_restore:"↩ Bu antrenmana geri yükle",
     photo_source_title:"Fotoğraf ekle", photo_source_camera:"📸 Fotoğraf çek", photo_source_gallery:"🖼️ Galeriden seç",
     photo_main:"Genel görünüm", photo_detail1:"Detay 1", photo_detail2:"Detay 2",
     bilan_this_month:"Bu ay", bilan_sessions:"ANTRENMAN", bilan_total_time:"TOPLAM SÜRE", bilan_total_weight:"KALDIRILAN KG (KG×TEKRAR)",
@@ -2401,7 +2408,7 @@ var TRANSLATIONS = {
     reset_all:"Zresetuj wszystko, łącznie z zapisanymi ćwiczeniami",
     color_modal_title:"Wybierz kolor", color_validate_btn:"Zatwierdź",
     exo_picker_title:"Dodaj ćwiczenie", exo_picker_new:"＋ Nowe puste ćwiczenie", exo_picker_or:"— lub użyj istniejącego ćwiczenia —",
-    exo_picker_empty:"Nie ma jeszcze żadnego ćwiczenia.", exo_archived_tag:"zarchiwizowano",
+    exo_picker_empty:"Nie ma jeszcze żadnego ćwiczenia.", exo_archived_tag:"zarchiwizowano", archived_exos_btn:"🗄️ Zarchiwizowane ćwiczenia ({0})", arch_title:"Zarchiwizowane ćwiczenia", arch_none:"Brak zarchiwizowanych ćwiczeń.", arch_no_data:"Brak zapisanych danych.", arch_restore:"↩ Przywróć w tym treningu",
     photo_source_title:"Dodaj zdjęcie", photo_source_camera:"📸 Zrób zdjęcie", photo_source_gallery:"🖼️ Wybierz z galerii",
     photo_main:"Widok ogólny", photo_detail1:"Szczegół 1", photo_detail2:"Szczegół 2",
     bilan_this_month:"W tym miesiącu", bilan_sessions:"TRENINGI", bilan_total_time:"CAŁKOWITY CZAS", bilan_total_weight:"UNIESIONE KG (KG×POWT.)",
@@ -2469,7 +2476,7 @@ var TRANSLATIONS = {
     reset_all:"إعادة تعيين كل شيء، بما في ذلك التمارين المحفوظة",
     color_modal_title:"اختر لونًا", color_validate_btn:"تأكيد",
     exo_picker_title:"إضافة تمرين", exo_picker_new:"＋ تمرين جديد فارغ", exo_picker_or:"— أو إعادة استخدام تمرين موجود —",
-    exo_picker_empty:"لا يوجد أي تمرين حتى الآن.", exo_archived_tag:"مؤرشف",
+    exo_picker_empty:"لا يوجد أي تمرين حتى الآن.", exo_archived_tag:"مؤرشف", archived_exos_btn:"🗄️ التمارين المؤرشفة ({0})", arch_title:"التمارين المؤرشفة", arch_none:"لا توجد تمارين مؤرشفة.", arch_no_data:"لا توجد بيانات مسجلة.", arch_restore:"↩ استعادة في هذه الحصة",
     photo_source_title:"إضافة صورة", photo_source_camera:"📸 التقاط صورة", photo_source_gallery:"🖼️ الاختيار من المعرض",
     photo_main:"صورة عامة", photo_detail1:"تفصيل 1", photo_detail2:"تفصيل 2",
     bilan_this_month:"هذا الشهر", bilan_sessions:"عدد الحصص", bilan_total_time:"الوقت الإجمالي", bilan_total_weight:"الوزن المرفوع (كغ×تكرار)",
@@ -2539,7 +2546,7 @@ var TRANSLATIONS = {
     reset_all:"Reset everything, including saved exercises",
     color_modal_title:"Choose a color", color_validate_btn:"Confirm",
     exo_picker_title:"Add an exercise", exo_picker_new:"＋ New blank exercise", exo_picker_or:"— or reuse an existing exercise —",
-    exo_picker_empty:"No existing exercise yet.", exo_archived_tag:"archived",
+    exo_picker_empty:"No existing exercise yet.", exo_archived_tag:"archived", archived_exos_btn:"🗄️ Archived exercises ({0})", arch_title:"Archived exercises", arch_none:"No archived exercise.", arch_no_data:"No data recorded.", arch_restore:"↩ Restore to this workout",
     photo_source_title:"Add a photo", photo_source_camera:"📸 Take a photo", photo_source_gallery:"🖼️ Choose from gallery",
     photo_main:"Overview", photo_detail1:"Detail 1", photo_detail2:"Detail 2",
     bilan_this_month:"This month", bilan_sessions:"WORKOUTS", bilan_total_time:"TOTAL TIME", bilan_total_weight:"KG LIFTED (KG×REPS)",
@@ -2609,7 +2616,7 @@ var TRANSLATIONS = {
     reset_all:"सहेजे गए व्यायामों सहित सब कुछ रीसेट करें",
     color_modal_title:"एक रंग चुनें", color_validate_btn:"पुष्टि करें",
     exo_picker_title:"व्यायाम जोड़ें", exo_picker_new:"＋ नया खाली व्यायाम", exo_picker_or:"— या किसी मौजूदा व्यायाम का पुनः उपयोग करें —",
-    exo_picker_empty:"अभी तक कोई व्यायाम मौजूद नहीं है।", exo_archived_tag:"संग्रहीत",
+    exo_picker_empty:"अभी तक कोई व्यायाम मौजूद नहीं है।", exo_archived_tag:"संग्रहीत", archived_exos_btn:"🗄️ संग्रहीत व्यायाम ({0})", arch_title:"संग्रहीत व्यायाम", arch_none:"कोई संग्रहीत व्यायाम नहीं।", arch_no_data:"कोई डेटा दर्ज नहीं।", arch_restore:"↩ इस वर्कआउट में वापस लाएँ",
     photo_source_title:"फोटो जोड़ें", photo_source_camera:"📸 फोटो लें", photo_source_gallery:"🖼️ गैलरी से चुनें",
     photo_main:"सामान्य दृश्य", photo_detail1:"विवरण 1", photo_detail2:"विवरण 2",
     bilan_this_month:"इस महीने", bilan_sessions:"वर्कआउट", bilan_total_time:"कुल समय", bilan_total_weight:"उठाया गया किग्रा (किग्रा×बार)",
@@ -2677,7 +2684,7 @@ var TRANSLATIONS = {
     reset_all:"Reset semuanya, termasuk latihan yang tersimpan",
     color_modal_title:"Pilih warna", color_validate_btn:"Konfirmasi",
     exo_picker_title:"Tambah latihan", exo_picker_new:"＋ Latihan kosong baru", exo_picker_or:"— atau gunakan kembali latihan yang sudah ada —",
-    exo_picker_empty:"Belum ada latihan yang tersimpan.", exo_archived_tag:"diarsipkan",
+    exo_picker_empty:"Belum ada latihan yang tersimpan.", exo_archived_tag:"diarsipkan", archived_exos_btn:"🗄️ Latihan diarsipkan ({0})", arch_title:"Latihan diarsipkan", arch_none:"Tidak ada latihan diarsipkan.", arch_no_data:"Tidak ada data tercatat.", arch_restore:"↩ Pulihkan ke sesi ini",
     photo_source_title:"Tambah foto", photo_source_camera:"📸 Ambil foto", photo_source_gallery:"🖼️ Pilih dari galeri",
     photo_main:"Tampilan umum", photo_detail1:"Detail 1", photo_detail2:"Detail 2",
     bilan_this_month:"Bulan ini", bilan_sessions:"SESI LATIHAN", bilan_total_time:"WAKTU TOTAL", bilan_total_weight:"KG TERANGKAT (KG×KALI)",
@@ -2997,7 +3004,14 @@ function lockAllButLast(day){
   day.weeks.forEach(function(w, i){ w.locked = (i !== day.weeks.length - 1); });
 }
 function newExoId(day){
-  day.nextExoId = (day.nextExoId || day.exercises.length || 0) + 1;
+  // Jamais de réutilisation d'un identifiant : on prend le plus grand déjà vu (actifs, archivés, lignes de
+  // toutes les semaines) + 1, pour qu'un nouvel exercice ne puisse JAMAIS se confondre avec un ancien.
+  var max = day.nextExoId || 0;
+  function scan(id){ var n = parseInt(String(id).replace(/^ex/, ""), 10); if(!isNaN(n) && n > max) max = n; }
+  (day.exercises || []).forEach(function(e){ scan(e.id); });
+  (day.archivedExercises || []).forEach(function(e){ scan(e.id); });
+  (day.weeks || []).forEach(function(w){ (w.rows || []).forEach(function(r){ scan(r.exerciseId); }); });
+  day.nextExoId = max + 1;
   return "ex" + day.nextExoId;
 }
 function getWeekRow(week, exoId){
@@ -3075,6 +3089,14 @@ function migrateShape(parsed){
       var n = parseInt(String(ex.id).replace(/^ex/,""),10);
       if(!isNaN(n) && n>maxId) maxId = n;
     });
+    (day.archivedExercises || []).forEach(function(ex){
+      var na = parseInt(String(ex.id).replace(/^ex/,""),10);
+      if(!isNaN(na) && na>maxId) maxId = na;
+    });
+    (day.weeks || []).forEach(function(w){ (w.rows || []).forEach(function(r){
+      var nr = parseInt(String(r.exerciseId).replace(/^ex/,""),10);
+      if(!isNaN(nr) && nr>maxId) maxId = nr;
+    }); });
     if(!day.nextExoId || day.nextExoId < maxId) day.nextExoId = maxId;
 
     if(!day.weeks || !day.weeks.length) day.weeks = [ defaultWeek(1, day.exercises.map(function(e){return e.id;})) ];
@@ -3386,6 +3408,8 @@ function renderSeriesList(){
     html += '</div>'; // fin exo-section
   });
   html += '<button class="add-exo-band" data-role="add-exo">＋ Ajouter un exercice</button>';
+  var nArch = (data.archivedExercises || []).length;
+  if(nArch) html += '<button class="add-exo-band arch-band" data-role="open-archived">'+tf("archived_exos_btn", nArch)+'</button>';
   seriesList.innerHTML = html;
   seriesList._renderedDay = state.currentDay;
   initSeriesScrollers();
@@ -4055,6 +4079,10 @@ document.addEventListener("click", function(e){
     openExoPicker();
     return;
   }
+  if(role === "open-archived"){
+    openArchivedViewer();
+    return;
+  }
 
   if(role === "exo-del"){
     var edi = +elT.getAttribute("data-exo");
@@ -4660,10 +4688,10 @@ document.getElementById("resetAllBtn").addEventListener("click", function(){
 
 /* ================= sélecteur d'exercices (nouveau vierge ou repris d'une autre séance) ================= */
 var exoPickerModal = document.getElementById("exoPickerModal");
-function addExerciseToCurrentDay(exoData, seedSeries, sourceDayForHistory, sourceExoId){
+function addExerciseToCurrentDay(exoData, seedSeries, sourceDayForHistory, sourceExoId, insertAt){
   var data = currentData();
   exoData.id = newExoId(data);
-  data.exercises.push(exoData);
+  if(typeof insertAt === "number") data.exercises.splice(insertAt, 0, exoData); else data.exercises.push(exoData);
 
   // Si on reprend un exercice qui existe déjà ailleurs, on retrouve son historique
   // semaine par semaine (indexé par vraie semaine calendaire ISO + année) pour que
@@ -4699,24 +4727,17 @@ function addExerciseToCurrentDay(exoData, seedSeries, sourceDayForHistory, sourc
   saveState();
   renderSeriesList();
 }
-// Applique un remplacement d'exercice : gèle l'ancien nom sur les semaines
-// verrouillées, cherche "newName" dans tout l'historique (actif + archivé,
-// toutes séances) pour reprendre son meilleur poids/reps sur la semaine en
-// cours, sinon la semaine en cours repart à zéro.
+// Remplacement d'un exercice : on crée un NOUVEL exercice (nouvel identifiant, nom, photos et données propres)
+// à la même place, et l'ancien est ARCHIVÉ tel quel (nom, photos, toutes ses semaines) : rien de l'ancien n'est
+// modifié ni écrasé. Si le nouveau nom existe déjà ailleurs (toutes séances, actifs ou archivés), ses données
+// (séries, charges, reps, repos, photos) sont COPIÉES comme point de départ, avec la meilleure charge connue.
 function applyExerciseReplace(exoR, newName, pickedSource){
   newName = (newName || "").trim();
   if(!newName || newName === exoR.name) return;
   var data = currentData();
-  var oldName = exoR.name;
+  var idx = data.exercises.indexOf(exoR);
+  if(idx < 0) return;
 
-  data.weeks.forEach(function(week){
-    if(!week.locked) return;
-    var rowEntry = getWeekRow(week, exoR.id);
-    if(rowEntry && !rowEntry.nameAtTime) rowEntry.nameAtTime = oldName;
-  });
-
-  // Même exercice (même nom) dans toutes les séances, actifs ou archivés : on retient pour chacun ses
-  // données les plus récentes (dernière semaine où une charge est renseignée).
   var newNameLower = newName.toLowerCase();
   var matches = [];
   state.dayOrder.forEach(function(d){
@@ -4732,7 +4753,7 @@ function applyExerciseReplace(exoR, newName, pickedSource){
         if(r.series.some(function(x){ return !isNaN(parseFloat(x.charge)); })) found = {series:r.series, startDate:day2.weeks[i].startDate};
       }
       found = found || fallback;
-      if(found) matches.push({exo:otherExo, series:found.series, startDate:found.startDate || ""});
+      if(found) matches.push({exo:otherExo, day:day2, series:found.series, startDate:found.startDate || ""});
     });
   });
   var primary = null;
@@ -4749,38 +4770,22 @@ function applyExerciseReplace(exoR, newName, pickedSource){
     });
   });
 
-  var currentWeek = data.weeks[data.weeks.length - 1];
-  var currentRow = getWeekRow(currentWeek, exoR.id);
-  if(currentRow && currentRow.series){
-    if(primary){
-      // Reprise de la structure réelle : nombre de séries, charge, reps et repos de chaque série ; les séries
-      // plus légères que la meilleure charge connue sont relevées à celle-ci (même règle que la semaine suivante).
-      currentRow.series = primary.series.map(function(x){
-        var c = parseFloat(x.charge);
-        var lift = (bestCharge !== null && (isNaN(c) || bestCharge > c));
-        return {
-          charge: lift ? String(bestCharge) : x.charge,
-          reps: lift ? bestReps : x.reps,
-          rest: x.rest,
-          validated:false, chargeAuto:true, repsAuto:true, restAuto:true
-        };
-      });
-      var src = primary.exo;
-      ["photo","detail1","detail2"].forEach(function(k){ if(src[k]) exoR[k] = src[k]; });
-      if(src.restBetweenExercises !== undefined) exoR.restBetweenExercises = src.restBetweenExercises;
-    } else {
-      currentRow.series.forEach(function(s){
-        s.charge = "";
-        s.reps = "";
-        s.validated = false;
-        s.chargeAuto = true; s.repsAuto = true;
-      });
-    }
+  var newExo = defaultExercise(newName);
+  var seed = null;
+  if(primary){
+    seed = primary.series.map(function(x){
+      var c = parseFloat(x.charge), lift = (bestCharge !== null && (isNaN(c) || bestCharge > c));
+      return { charge: lift ? String(bestCharge) : x.charge, reps: lift ? bestReps : x.reps, rest: x.rest };
+    });
+    ["photo","detail1","detail2"].forEach(function(k){ if(primary.exo[k]) newExo[k] = primary.exo[k]; }); // copies
+    if(primary.exo.restBetweenExercises !== undefined) newExo.restBetweenExercises = primary.exo.restBetweenExercises;
   }
 
-  exoR.name = newName;
-  saveState();
-  renderSeriesList();
+  // l'ancien exercice est archivé, intact ; le nouveau prend sa place
+  data.exercises.splice(idx, 1);
+  if(!data.archivedExercises) data.archivedExercises = [];
+  data.archivedExercises.push(exoR);
+  addExerciseToCurrentDay(newExo, seed, primary ? primary.day : null, primary ? primary.exo.id : null, idx);
   renderDayPills();
 }
 var pickerMode = "add"; // "add" (comportement existant) | "replace" (remplacement d'un exercice précis)
@@ -4788,6 +4793,8 @@ var pickerTargetExoIndex = null;
 function openExoPicker(mode, targetIdx){
   pickerMode = mode || "add";
   pickerTargetExoIndex = (typeof targetIdx === "number") ? targetIdx : null;
+  var orEl0 = document.querySelector('#exoPickerModal [data-i18n="exo_picker_or"]'); if(orEl0) orEl0.style.display = "";
+  var titleEl0 = document.querySelector('#exoPickerModal [data-i18n="exo_picker_title"]'); if(titleEl0) titleEl0.textContent = t("exo_picker_title");
   document.getElementById("epmNewBtn").style.display = (pickerMode === "replace") ? "none" : "";
   var html = "";
   state.dayOrder.forEach(function(d){
@@ -4810,6 +4817,40 @@ function openExoPicker(mode, targetIdx){
   document.getElementById("epmList").innerHTML = html || '<div class="epm-group-label">'+t("exo_picker_empty")+'</div>';
   exoPickerModal.classList.add("open");
 }
+/* Exercices archivés : consultation en lecture seule (aucune donnée n'est modifiée) + restauration possible. */
+function fmtDM(dateStr){ var d = new Date(dateStr); return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0"); }
+function openArchivedViewer(){
+  pickerMode = "view";
+  var data = currentData();
+  document.getElementById("epmNewBtn").style.display = "none";
+  var orEl = document.querySelector('#exoPickerModal [data-i18n="exo_picker_or"]'); if(orEl) orEl.style.display = "none";
+  var titleEl = document.querySelector('#exoPickerModal [data-i18n="exo_picker_title"]'); if(titleEl) titleEl.textContent = t("arch_title");
+  var html = "";
+  (data.archivedExercises || []).forEach(function(exo, idx){
+    html += '<div class="arch-item"><button class="epm-item epm-archived" data-role="arch-toggle" data-idx="'+idx+'">🗄️ '+escapeHtml(exo.name)+' <span class="epm-archived-tag">'+t("exo_archived_tag")+'</span> ▾</button><div class="arch-panel" id="archPanel'+idx+'" style="display:none;"></div></div>';
+  });
+  document.getElementById("epmList").innerHTML = html || '<div class="epm-group-label">'+t("arch_none")+'</div>';
+  exoPickerModal.classList.add("open");
+}
+function fillArchivedPanel(idx){
+  var data = currentData(), exo = (data.archivedExercises || [])[idx], panel = document.getElementById("archPanel"+idx);
+  if(!exo || !panel) return;
+  var h = "";
+  var pics = [exo.photo, exo.detail1, exo.detail2].filter(function(x){ return !!x; });
+  if(pics.length) h += '<div class="arch-pics">'+pics.map(function(src){ return '<img src="'+src+'" alt="">'; }).join("")+'</div>';
+  var lines = 0;
+  data.weeks.slice().reverse().forEach(function(w){
+    var row = getWeekRow(w, exo.id);
+    if(!row || !row.series || !row.series.length) return;
+    var end = new Date(w.startDate); end.setDate(end.getDate() + 6);
+    var vals = row.series.map(function(x){ return (x.charge !== "" ? x.charge : "–")+"×"+(x.reps !== "" ? x.reps : "–")+(x.validated ? " ✓" : ""); }).join(" · ");
+    h += '<div class="arch-week"><b>S.'+isoWeekNumber(w.startDate)+'</b> <span>'+fmtDM(w.startDate)+' – '+fmtDM(end)+'</span><div>'+escapeHtml(vals)+'</div></div>';
+    lines++;
+  });
+  if(!lines) h += '<div class="arch-week">'+t("arch_no_data")+'</div>';
+  h += '<button class="add-exo-btn" data-role="arch-restore" data-idx="'+idx+'" style="margin-top:8px;">'+t("arch_restore")+'</button>';
+  panel.innerHTML = h;
+}
 document.getElementById("epmClose").addEventListener("click", function(){ exoPickerModal.classList.remove("open"); markModalClosed(); });
 exoPickerModal.addEventListener("click", function(e){ if(e.target === exoPickerModal){ exoPickerModal.classList.remove("open"); markModalClosed(); } });
 document.getElementById("epmNewBtn").addEventListener("click", function(){
@@ -4818,6 +4859,19 @@ document.getElementById("epmNewBtn").addEventListener("click", function(){
   exoPickerModal.classList.remove("open");
 });
 document.getElementById("epmList").addEventListener("click", function(e){
+  var tgl = e.target.closest('[data-role="arch-toggle"]');
+  if(tgl){
+    var pidx = +tgl.getAttribute("data-idx"), pnl = document.getElementById("archPanel"+pidx);
+    if(pnl){ if(pnl.style.display === "none"){ fillArchivedPanel(pidx); pnl.style.display = "block"; } else pnl.style.display = "none"; }
+    return;
+  }
+  var rst = e.target.closest('[data-role="arch-restore"]');
+  if(rst){
+    var ridx = +rst.getAttribute("data-idx"), dd = currentData(), exoBack = (dd.archivedExercises || [])[ridx];
+    if(exoBack){ dd.archivedExercises.splice(ridx, 1); dd.exercises.push(exoBack); saveState(); renderSeriesList(); renderDayPills(); }
+    exoPickerModal.classList.remove("open"); markModalClosed();
+    return;
+  }
   var tEl = e.target.closest('[data-role="epm-pick"]');
   if(!tEl) return;
   var day = decodeURIComponent(tEl.getAttribute("data-day"));
