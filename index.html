@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.54</title>
+<title>OVERBOLT | NO BS v3.55</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -862,7 +862,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.54</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.55</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -5292,8 +5292,9 @@ function startFloatTimer(seconds, label){
   saveRest();
 }
 function finishRest(overdueMs){
-  clearInterval(timerHandle); timerHandle = null;
+  clearInterval(timerHandle);
   timerRemaining = 0; timerFinished = true;
+  timerHandle = setInterval(tickTimer, 1000); // continue de tourner : affiche le temps écoulé depuis la fin (+mm:ss)
   ft.classList.add("show"); ft.classList.add("resting"); ft.classList.add("ending");
   updateFtDisplay();
   ftLabel.textContent = t("rest_done_label");
@@ -5305,7 +5306,8 @@ function finishRest(overdueMs){
   saveRest();
 }
 function tickTimer(){
-  if(timerPaused || timerFinished || !timerEndAt) return;
+  if(timerFinished){ updateFtDisplay(); return; }
+  if(timerPaused || !timerEndAt) return;
   var rem = Math.max(0, Math.ceil((timerEndAt - Date.now()) / 1000));
   timerRemaining = rem;
   if(rem <= 5) ft.classList.add("ending");
@@ -5324,14 +5326,21 @@ function restoreRest(){
   timerEndAt = r.endAt || 0; timerRemaining = r.remaining || 0; timerFinished = !!r.finished;
   ft.classList.add("show"); ft.classList.add("resting");
   ftLabel.textContent = timerLabel; ftPauseBtn.textContent = timerPaused ? "▶" : "⏸";
-  if(timerFinished){ timerRemaining = 0; ft.classList.add("ending"); ftLabel.textContent = t("rest_done_label"); updateFtDisplay(); return; }
+  if(timerFinished){
+    timerRemaining = 0; ft.classList.add("ending"); ftLabel.textContent = t("rest_done_label"); updateFtDisplay();
+    clearInterval(timerHandle); timerHandle = setInterval(tickTimer, 1000);
+    return;
+  }
   if(timerPaused){ updateFtDisplay(); return; }
   clearInterval(timerHandle); timerHandle = setInterval(tickTimer, 1000);
   tickTimer();
 }
 // Au retour dans l'app (veille, autre application, autre onglet) : tout est recalculé immédiatement.
 function syncTimersNow(){
-  if(!timerPaused && !timerFinished && timerEndAt){
+  if(timerFinished && timerEndAt){
+    if(!timerHandle) timerHandle = setInterval(tickTimer, 1000);
+    updateFtDisplay();
+  } else if(!timerPaused && timerEndAt){
     if(!timerHandle) timerHandle = setInterval(tickTimer, 1000);
     tickTimer();
   }
@@ -5341,8 +5350,13 @@ document.addEventListener("visibilitychange", function(){ if(document.visibility
 window.addEventListener("pageshow", syncTimersNow);
 window.addEventListener("focus", syncTimersNow);
 function updateFtDisplay(){
-  var m = Math.floor(timerRemaining/60), s = timerRemaining%60;
-  ftTime.textContent = (m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+  var pre = "", v = timerRemaining;
+  if(timerFinished && timerEndAt){ // repos terminé : temps écoulé depuis la fin, pour ne pas ressembler à un chrono remis à zéro
+    v = Math.min(5999, Math.max(0, Math.floor((Date.now() - timerEndAt) / 1000)));
+    pre = "+";
+  }
+  var m = Math.floor(v/60), s = v%60;
+  ftTime.textContent = pre+(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
 }
 function triggerScreenFlash(){
   var overlay = document.getElementById("flashOverlay");
