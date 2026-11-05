@@ -15,7 +15,7 @@
   Reproduction, distribution ou revente de ce fichier, en tout ou partie,
   interdites sans autorisation écrite préalable de l'auteur.
 -->
-<title>OVERBOLT | NO BS v3.55</title>
+<title>OVERBOLT | NO BS v3.56</title>
 <style>
 :root{
   --bg-0:#05070a;
@@ -862,7 +862,7 @@ html.licensed #licenseGate{ display:none !important; }
 
 <header id="mainHeader">
   <div class="title-row">
-    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.55</span></h1>
+    <h1>OVERBOLT | <span class="no-bs">NO BS</span><span class="ver" id="verTag">v3.56</span></h1>
     <div class="head-btns">
       <div class="menu-wrap">
         <button id="menuBtn" class="btn-icon" data-i18n-title="menu_title" title="Menu">⋮</button>
@@ -4688,7 +4688,7 @@ document.getElementById("resetAllBtn").addEventListener("click", function(){
 
 /* ================= sélecteur d'exercices (nouveau vierge ou repris d'une autre séance) ================= */
 var exoPickerModal = document.getElementById("exoPickerModal");
-function addExerciseToCurrentDay(exoData, seedSeries, sourceDayForHistory, sourceExoId, insertAt){
+function addExerciseToCurrentDay(exoData, seedSeries, sourceDayForHistory, sourceExoId, insertAt, replacedExo){
   var data = currentData();
   exoData.id = newExoId(data);
   if(typeof insertAt === "number") data.exercises.splice(insertAt, 0, exoData); else data.exercises.push(exoData);
@@ -4708,11 +4708,21 @@ function addExerciseToCurrentDay(exoData, seedSeries, sourceDayForHistory, sourc
     });
   }
 
-  data.weeks.forEach(function(week){
+  data.weeks.forEach(function(week, wi){
     var matched = null;
     if(historyByWeekKey){
       var key = new Date(week.startDate).getFullYear() + "-" + isoWeekNumber(week.startDate);
       matched = historyByWeekKey[key] || null;
+    }
+    // Remplacement : les semaines PASSÉES de l'exercice remplacé restent visibles dans la barre de défilement
+    // du nouvel exercice (copie, validated=false pour ne pas compter deux fois dans le Bilan), étiquetées du
+    // nom d'origine. L'original reste intact dans les exercices archivés.
+    if(!matched && replacedExo && wi < data.weeks.length - 1){
+      var oldRow = getWeekRow(week, replacedExo.id);
+      if(oldRow && oldRow.series && oldRow.series.length){
+        week.rows.push({ exerciseId: exoData.id, series: oldRow.series.map(cloneSerieFrom), nameAtTime: replacedExo.name });
+        return;
+      }
     }
     if(week.locked){
       // Exception ciblée : on ne modifie jamais une performance déjà enregistrée,
@@ -4785,7 +4795,7 @@ function applyExerciseReplace(exoR, newName, pickedSource){
   data.exercises.splice(idx, 1);
   if(!data.archivedExercises) data.archivedExercises = [];
   data.archivedExercises.push(exoR);
-  addExerciseToCurrentDay(newExo, seed, primary ? primary.day : null, primary ? primary.exo.id : null, idx);
+  addExerciseToCurrentDay(newExo, seed, primary ? primary.day : null, primary ? primary.exo.id : null, idx, exoR);
   renderDayPills();
 }
 var pickerMode = "add"; // "add" (comportement existant) | "replace" (remplacement d'un exercice précis)
